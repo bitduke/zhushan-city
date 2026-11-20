@@ -1,0 +1,111 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "竹山同城",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/benefit/shop",
+      "style": {
+        "navigationBarTitleText": "门店专属福利",
+        "navigationBarBackgroundColor": "#1E3A8A",
+        "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/coupon/mine",
+      "style": {
+        "navigationBarTitleText": "我的卡券包",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/coupon/code",
+      "style": {
+        "navigationBarTitleText": "券码核销出示"
+      }
+    },
+    {
+      "path": "pages/info/list",
+      "style": {
+        "navigationBarTitleText": "便民信息",
+        "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/info/detail",
+      "style": {
+        "navigationBarTitleText": "信息详情"
+      }
+    },
+    {
+      "path": "pages/info/publish",
+      "style": {
+        "navigationBarTitleText": "发布便民信息"
+      }
+    },
+    {
+      "path": "pages/merchant/index",
+      "style": {
+        "navigationBarTitleText": "商家工作台"
+      }
+    },
+    {
+      "path": "pages/merchant/verify",
+      "style": {
+        "navigationBarTitleText": "扫码与输码核销"
+      }
+    },
+    {
+      "path": "pages/merchant/appointment",
+      "style": {
+        "navigationBarTitleText": "服务预约处理"
+      }
+    },
+    {
+      "path": "pages/merchant/ranking",
+      "style": {
+        "navigationBarTitleText": "引流贡献榜 & 拓客合作"
+      }
+    },
+    {
+      "path": "pages/user/index",
+      "style": {
+        "navigationBarTitleText": "个人中心"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "竹山同城",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F3F4F6"
+  },
+  "tabBar": {
+    "color": "#6B7280",
+    "selectedColor": "#2563EB",
+    "borderStyle": "black",
+    "backgroundColor": "#FFFFFF",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/coupon/mine",
+        "text": "券包"
+      },
+      {
+        "pagePath": "pages/merchant/index",
+        "text": "商家"
+      },
+      {
+        "pagePath": "pages/user/index",
+        "text": "我的"
+      }
+    ]
+  }
+}

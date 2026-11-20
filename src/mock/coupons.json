@@ -1,0 +1,50 @@
+[
+  {
+    "_id": "uc_001",
+    "code": "ZS2026112001",
+    "user_id": "u_test_01",
+    "coupon_id": "cp_self_001",
+    "merchant_id": "shop_001",
+    "merchant_name": "雅致名媛女装店",
+    "merchant_address": "竹山县人民路步行街中段18号",
+    "merchant_phone": "13872810001",
+    "status": "UNUSED",
+    "claimed_at": "2026-11-20 14:30",
+    "expires_at": "2026-12-31 23:59",
+    "rule_snapshot": {
+      "title": "本店试衣结账当场立减券",
+      "type": "FULL_REDUCTION",
+      "condition_amount": 200,
+      "discount_amount": 20,
+      "usage_mode": "INSTANT",
+      "booking_required": false,
+      "valid_days": 40,
+      "instructions": "结账前向店员出示本券，当场立减 20 元（特价清仓款除外）"
+    }
+  },
+  {
+    "_id": "uc_002",
+    "code": "ZS2026112002",
+    "user_id": "u_test_01",
+    "coupon_id": "cp_cross_002",
+    "merchant_id": "shop_002",
+    "merchant_name": "奈奈日式美睫美甲沙龙",
+    "merchant_address": "竹山县北大街银座二楼",
+    "merchant_phone": "13972820002",
+    "source_merchant_id": "shop_001",
+    "status": "UNUSED",
+    "claimed_at": "2026-11-20 14:32",
+    "expires_at": "2026-12-31 23:59",
+    "has_appointment": true,
+    "rule_snapshot": {
+      "title": "雅致老客专享·38元纯色美甲体验",
+      "type": "EXPERIENCE",
+      "condition_amount": 0,
+      "discount_amount": 60,
+      "usage_mode": "BOOKING",
+      "booking_required": true,
+      "valid_days": 40,
+      "instructions": "凭雅致女装扫码凭据到店，享原价98元纯色跳色款美甲，限新客体验，需提前小程序预约"
+    }
+  }
+]

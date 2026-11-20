@@ -1,0 +1,38 @@
+[
+  {
+    "merchant_id": "shop_001",
+    "merchant_name": "雅致名媛女装店",
+    "category_name": "服装女装",
+    "town": "城关镇",
+    "avatar": "https://picsum.photos/200/200?random=1",
+    "total_brought_guests": 38,
+    "coop_merchants_count": 3,
+    "conversion_rate": 42.5,
+    "sample_size": 90,
+    "is_new_partner": false
+  },
+  {
+    "merchant_id": "shop_005",
+    "merchant_name": "顺捷精品汽车养护中心",
+    "category_name": "汽车美容",
+    "town": "城关镇",
+    "avatar": "https://picsum.photos/200/200?random=5",
+    "total_brought_guests": 29,
+    "coop_merchants_count": 2,
+    "conversion_rate": 35.8,
+    "sample_size": 81,
+    "is_new_partner": false
+  },
+  {
+    "merchant_id": "shop_008",
+    "merchant_name": "楚茶小憩中式茶舍",
+    "category_name": "特色餐饮",
+    "town": "城关镇",
+    "avatar": "https://picsum.photos/200/200?random=8",
+    "total_brought_guests": 19,
+    "coop_merchants_count": 2,
+    "conversion_rate": 31.0,
+    "sample_size": 61,
+    "is_new_partner": true
+  }
+]

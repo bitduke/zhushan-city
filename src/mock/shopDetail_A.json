@@ -1,0 +1,71 @@
+{
+  "merchant": {
+    "_id": "shop_001",
+    "name": "雅致名媛女装店 (城关人民路店)",
+    "category_name": "服装女装",
+    "town": "城关镇",
+    "address": "竹山县人民路步行街中段18号 (移动营业厅对面)",
+    "phone": "13872810001",
+    "avatar": "https://picsum.photos/200/200?random=1",
+    "business_hours": "09:30 - 21:30",
+    "description": "专注高品质轻熟女装，主营羊绒、真丝及当季新款。凭码进店即享试穿礼！"
+  },
+  "self_coupon": {
+    "_id": "cp_self_001",
+    "merchant_id": "shop_001",
+    "merchant_name": "雅致名媛女装店",
+    "title": "本店试衣结账当场立减券",
+    "type": "FULL_REDUCTION",
+    "usage_mode": "INSTANT",
+    "condition_amount": 200,
+    "discount_amount": 20,
+    "booking_required": false,
+    "instructions": "结账前向店员出示本券，当场立减 20 元（特价清仓款除外）",
+    "start_time": "2026-11-01",
+    "end_time": "2026-12-31",
+    "claimed_count": 89,
+    "total_count": 200
+  },
+  "cross_coupons": [
+    {
+      "_id": "cp_cross_002",
+      "merchant_id": "shop_002",
+      "merchant_name": "奈奈日式美睫美甲沙龙",
+      "merchant_address": "竹山县北大街银座二楼 (距本店120米)",
+      "merchant_phone": "13972820002",
+      "title": "雅致老客专享·38元纯色美甲体验",
+      "type": "EXPERIENCE",
+      "usage_mode": "BOOKING",
+      "condition_amount": 0,
+      "discount_amount": 60,
+      "booking_required": true,
+      "instructions": "凭雅致女装扫码凭据到店，享原价98元纯色跳色款美甲，限新客体验，需提前小程序预约",
+      "start_time": "2026-11-01",
+      "end_time": "2026-12-31",
+      "claimed_count": 42,
+      "total_count": 100,
+      "source_merchant_id": "shop_001",
+      "source_benefit_tag": "雅致女装VIP专享补贴"
+    },
+    {
+      "_id": "cp_cross_003",
+      "merchant_id": "shop_003",
+      "merchant_name": "御竹轩足道养生会所",
+      "merchant_address": "竹山县施洋路迎宾大厦3楼",
+      "merchant_phone": "13672830003",
+      "title": "68元古法足道体验 (原价138元)",
+      "type": "EXPERIENCE",
+      "usage_mode": "BOOKING",
+      "condition_amount": 0,
+      "discount_amount": 70,
+      "booking_required": true,
+      "instructions": "含60分钟古法中药足浴+肩颈放松，赠精美果盘，限新客首单，请提前预约时段",
+      "start_time": "2026-11-01",
+      "end_time": "2026-12-31",
+      "claimed_count": 31,
+      "total_count": 80,
+      "source_merchant_id": "shop_001",
+      "source_benefit_tag": "商圈联盟特约互推"
+    }
+  ]
+}

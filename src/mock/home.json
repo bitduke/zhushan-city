@@ -1,0 +1,87 @@
+{
+  "banners": [
+    {
+      "id": "b1",
+      "image": "/static/banner1.png",
+      "title": "竹山商圈联盟·进店扫码享好礼"
+    }
+  ],
+  "featured_shops": [
+    {
+      "id": "shop_001",
+      "name": "雅致名媛女装店 (城关人民路店)",
+      "category_name": "服装女装",
+      "town": "城关镇",
+      "address": "竹山县人民路步行街中段18号",
+      "phone": "1387281xxxx",
+      "avatar": "https://picsum.photos/200/200?random=1",
+      "distance": "0.3km",
+      "hot_coupon": "满200立减20元 (进店当场立减)",
+      "partner_count": 2
+    },
+    {
+      "id": "shop_002",
+      "name": "奈奈日式美睫美甲沙龙",
+      "category_name": "美容美甲",
+      "town": "城关镇",
+      "address": "竹山县北大街银座二楼",
+      "phone": "1397282xxxx",
+      "avatar": "https://picsum.photos/200/200?random=2",
+      "distance": "0.5km",
+      "hot_coupon": "38元精致纯色美甲体验 (立省60)",
+      "partner_count": 1
+    },
+    {
+      "id": "shop_003",
+      "name": "御竹轩足道养生会所",
+      "category_name": "足道养生",
+      "town": "城关镇",
+      "address": "竹山县施洋路迎宾大厦3楼",
+      "phone": "1367283xxxx",
+      "avatar": "https://picsum.photos/200/200?random=3",
+      "distance": "0.8km",
+      "hot_coupon": "68元古法足道体验 (需预约)",
+      "partner_count": 1
+    }
+  ],
+  "recent_infos": [
+    {
+      "_id": "info_101",
+      "title": "城关镇人民路二居室整租，采光极佳带家具家电",
+      "category_name": "房屋租售",
+      "town": "城关镇",
+      "price": 900,
+      "price_desc": "900元/月",
+      "author_name": "王女士(房东直租)",
+      "contact_phone": "13872888888",
+      "created_at": "10分钟前",
+      "view_count": 86,
+      "images": ["https://picsum.photos/400/300?random=11"]
+    },
+    {
+      "_id": "info_102",
+      "title": "自用九成新折叠电动车转让，带锂电池续航40公里",
+      "category_name": "二手闲置",
+      "town": "城关镇",
+      "price": 520,
+      "price_desc": "520元",
+      "author_name": "李先生",
+      "contact_phone": "13972999999",
+      "created_at": "35分钟前",
+      "view_count": 142,
+      "images": ["https://picsum.photos/400/300?random=12"]
+    },
+    {
+      "_id": "info_103",
+      "title": "竹山国际绿松石城实体老店，源头一手原矿高瓷蓝绿",
+      "category_name": "绿松石名片",
+      "town": "麻家渡镇",
+      "price_desc": "进店品鉴",
+      "author_name": "秦石坊工艺",
+      "contact_phone": "13572666666",
+      "created_at": "1小时前",
+      "view_count": 310,
+      "images": ["https://picsum.photos/400/300?random=13"]
+    }
+  ]
+}
