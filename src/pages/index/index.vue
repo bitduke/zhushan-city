@@ -1,114 +1,151 @@
 <template>
   <view class="container">
-    <!-- 顶部定位与搜索栏 -->
-    <view class="top-bar">
+    <!-- 1. 顶部手绘漫画招商横幅 -->
+    <view class="banner-section" @tap="onBannerClick">
+      <view class="banner-card">
+        <image 
+          class="banner-bg" 
+          :src="bannerImg" 
+          mode="aspectFill" 
+        />
+        <view class="banner-overlay">
+          <view class="banner-tag">首页广告位招商</view>
+          <view class="banner-title">
+            <text class="title-line">让竹山看见</text>
+            <text class="title-line">你的好生意</text>
+          </view>
+          <text class="banner-sub">首页首屏大图 · 开放合作</text>
+          <view class="banner-btn">
+            <text class="btn-text">了解详情</text>
+            <text class="btn-arrow">›</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 2. 标语与乡镇定位胶囊 -->
+    <view class="subbar-section">
+      <text class="slogan-text">竹山生态，刚好竹山达</text>
       <picker :range="townNames" :value="selectedTownIndex" @change="onTownChange">
-        <view class="town-picker">
-          <text class="location-icon">📍</text>
+        <view class="town-capsule">
+          <text class="location-pin">📍</text>
           <text class="town-name">{{ currentTown }}</text>
-          <text class="arrow">▼</text>
+          <text class="dropdown-arrow">▾</text>
         </view>
       </picker>
+    </view>
 
+    <!-- 3. 清爽国风搜索栏 -->
+    <view class="search-section">
       <view class="search-box">
-        <text class="search-icon">🔍</text>
+        <image class="search-ico" :src="searchIcon" mode="aspectFit" />
         <input 
           class="search-input" 
-          placeholder="搜索竹山租房、二手、商家福利..." 
+          placeholder="搜租房、二手、享商超好客" 
+          placeholder-class="search-ph"
           v-model="searchKeyword" 
           @confirm="onSearch"
         />
+        <text class="search-btn" @tap="onSearch">搜索</text>
       </view>
     </view>
 
-    <!-- 分类金刚区九宫格 -->
-    <view class="category-grid">
-      <view 
-        class="grid-item" 
-        v-for="cat in categories" 
-        :key="cat.id"
-        @tap="onCategoryClick(cat.id)"
-      >
-        <view class="icon-circle">
-          <text class="grid-icon">{{ getCategoryIcon(cat.id) }}</text>
+    <!-- 4. 便民分类金刚区卡片【你想找什么】 -->
+    <view class="card-wrap category-card">
+      <view class="card-head">
+        <view class="head-left">
+          <text class="en-sub">EXPLORE ZHUSHAN</text>
+          <text class="main-title">你想找什么</text>
         </view>
-        <text class="grid-label">{{ cat.name }}</text>
-      </view>
-    </view>
-
-    <!-- 联盟商家推荐位 (横滑卡片) -->
-    <view class="section-container" v-if="featuredShops.length > 0">
-      <view class="section-header">
-        <view class="title-wrap">
-          <text class="section-title">商圈联盟好店</text>
-          <text class="section-sub">进店扫码享专属礼遇</text>
-        </view>
+        <text class="head-right-tip">移步同城寻好物</text>
       </view>
 
-      <scroll-view class="shops-scroll" scroll-x show-scrollbar="false">
-        <view class="shops-wrap">
-          <view 
-            class="featured-shop-card" 
-            v-for="shop in featuredShops" 
-            :key="shop.id"
-            @tap="goToShopBenefit(shop.id)"
-          >
-            <image class="shop-thumb" :src="shop.avatar" mode="aspectFill" />
-            <view class="shop-info">
-              <text class="shop-name">{{ shop.name }}</text>
-              <text class="shop-hot">{{ shop.hot_coupon }}</text>
-              <view class="shop-bottom">
-                <text class="distance">{{ shop.distance }}</text>
-                <text class="go-btn">进店领券</text>
-              </view>
-            </view>
+      <view class="category-grid">
+        <view 
+          class="grid-item" 
+          v-for="cat in categories" 
+          :key="cat.id"
+          @tap="onCategoryClick(cat.id)"
+          hover-class="item-hover"
+          :hover-stay-time="100"
+        >
+          <view class="cat-icon-circle" :style="{ backgroundColor: cat.bg }">
+            <image 
+              v-if="cat.iconPath" 
+              class="cat-img" 
+              :src="cat.iconPath" 
+              mode="aspectFit" 
+            />
+            <text v-else class="cat-badge-txt" :style="{ color: cat.textColor }">{{ cat.shortText }}</text>
           </view>
+          <text class="cat-label">{{ cat.name }}</text>
         </view>
-      </scroll-view>
+      </view>
     </view>
 
-    <!-- 最新便民信息流 -->
-    <view class="section-container">
-      <view class="section-header">
-        <text class="section-title">最新便民信息</text>
-        <view class="category-tabs">
-          <text 
-            class="tab-item" 
-            :class="{ active: currentTab === 'all' }" 
-            @tap="switchTab('all')"
-          >全部</text>
-          <text 
-            class="tab-item" 
-            :class="{ active: currentTab === 'house' }" 
-            @tap="switchTab('house')"
-          >租房</text>
-          <text 
-            class="tab-item" 
-            :class="{ active: currentTab === 'idle' }" 
-            @tap="switchTab('idle')"
-          >二手</text>
-          <text 
-            class="tab-item" 
-            :class="{ active: currentTab === 'turquoise' }" 
-            @tap="switchTab('turquoise')"
-          >绿松石</text>
+    <!-- 5. 双色高对比行动大卡片 -->
+    <view class="action-cards-section">
+      <!-- 商圈联盟卡片 -->
+      <view 
+        class="action-card alliance-card" 
+        @tap="goToAlliance"
+        hover-class="card-hover"
+        :hover-stay-time="100"
+      >
+        <view class="action-content">
+          <text class="action-title">商圈联盟</text>
+          <text class="action-desc">凭券到店享福利</text>
+        </view>
+        <image class="action-bg-icon" :src="ticketIcon" mode="aspectFit" />
+      </view>
+
+      <!-- 发布信息卡片 -->
+      <view 
+        class="action-card publish-card" 
+        @tap="goToPublish"
+        hover-class="card-hover"
+        :hover-stay-time="100"
+      >
+        <view class="action-content">
+          <text class="action-title">发布信息</text>
+          <text class="action-desc">租房 · 买卖 · 求助</text>
+        </view>
+        <image class="action-bg-icon" :src="plusIcon" mode="aspectFit" />
+      </view>
+    </view>
+
+    <!-- 6. 身边的新消息流 -->
+    <view class="card-wrap feed-section">
+      <view class="card-head">
+        <view class="head-left">
+          <text class="en-sub">NEIGHBORHOOD</text>
+          <text class="main-title">身边的新消息</text>
+        </view>
+        <view class="more-link" @tap="goToInfoList">
+          <text>更多信息</text>
+          <text class="link-arrow">›</text>
         </view>
       </view>
 
-      <view class="info-list">
+      <!-- 信息流内容 -->
+      <view class="feed-content" v-if="infoList.length > 0">
         <InfoCard 
-          v-for="item in filteredInfos" 
+          v-for="item in infoList" 
           :key="item._id" 
           :info="item" 
           @click="goToInfoDetail(item._id)" 
         />
       </view>
-    </view>
 
-    <!-- 悬浮快速发布按钮 -->
-    <view class="fab-btn" @tap="goToPublish">
-      <text class="fab-icon">＋</text>
-      <text class="fab-text">发布便民</text>
+      <!-- 雅致国风空状态 -->
+      <view class="empty-state" v-else>
+        <view class="empty-icon-box">🏡</view>
+        <text class="empty-title">{{ currentTown }}暂无审核便民信息</text>
+        <text class="empty-subtitle">本镇街坊动态正在收录中，首发便民信息直享置顶关注</text>
+        <view class="empty-action-btn" @tap="goToPublish">
+          <text>＋ 免费发布第一条</text>
+        </view>
+      </view>
     </view>
   </view>
 </template>
@@ -116,24 +153,36 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { ZHUSHAN_TOWNS } from '@/constants/regions';
-import { INFO_CATEGORIES } from '@/constants/enums';
 import { getHomeData } from '@/api/home';
 import { useUserStore } from '@/store/user';
 import InfoCard from '@/components/InfoCard.vue';
 
+// 静态图片路径常量（避免 vite vue 插件将其转为缺失的 common/assets.js）
+const bannerImg = '/static/banners/zhushan-market-comic-v1.jpg';
+const searchIcon = '/static/icons/search.png';
+const ticketIcon = '/static/icons/tab-ticket.png';
+const plusIcon = '/static/icons/plus.png';
+
 const userStore = useUserStore();
 const currentTown = computed(() => userStore.selectedTown);
-const townNames = ZHUSHAN_TOWNS.map(t => t.name);
+const townNames = ['全竹山', ...ZHUSHAN_TOWNS.map(t => t.name)];
 const selectedTownIndex = computed(() => {
   const idx = townNames.indexOf(currentTown.value);
-  return idx >= 0 ? idx : 0;
+  return idx >= 0 ? idx : 1; // 默认城关镇
 });
 
 const searchKeyword = ref('');
-const categories = INFO_CATEGORIES;
-const featuredShops = ref<any[]>([]);
 const infoList = ref<any[]>([]);
-const currentTab = ref('all');
+
+// 分类与专属图标配置（与原图 100% 精确匹配）
+const categories = [
+  { id: 'house', name: '房屋租售', iconPath: '/static/icons/house.png', bg: '#EBF5FF', shortText: '' },
+  { id: 'idle', name: '二手闲置', iconPath: '/static/icons/box.png', bg: '#FEF3C7', shortText: '' },
+  { id: 'housekeeping', name: '家政保洁', iconPath: '/static/icons/broom.png', bg: '#FEE2E2', shortText: '' },
+  { id: 'carpool', name: '拼车互助', iconPath: '/static/icons/car.png', bg: '#E0F2FE', shortText: '' },
+  { id: 'transfer', name: '转让/合作', iconPath: '', bg: '#FEF9C3', shortText: '转', textColor: '#B45309' },
+  { id: 'other', name: '其他便民', iconPath: '', bg: '#F3E8FF', shortText: '自', textColor: '#7E22CE' }
+];
 
 onMounted(async () => {
   userStore.initUser();
@@ -142,8 +191,8 @@ onMounted(async () => {
 
 const loadData = async () => {
   try {
-    const data = await getHomeData({ town: currentTown.value });
-    featuredShops.value = data.featured_shops || [];
+    const townParam = currentTown.value === '全竹山' ? '' : currentTown.value;
+    const data = await getHomeData({ town: townParam });
     infoList.value = data.recent_infos || [];
   } catch (err) {
     console.error('Failed to load home data:', err);
@@ -151,369 +200,434 @@ const loadData = async () => {
 };
 
 const onTownChange = (e: any) => {
-  const idx = e.detail.value;
+  const idx = Number(e.detail.value);
   const town = townNames[idx];
   userStore.setTown(town);
   loadData();
 };
 
-const getCategoryIcon = (id: string) => {
-  const map: Record<string, string> = {
-    house: '🏠',
-    idle: '📦',
-    housekeeping: '🧹',
-    carpool: '🚗',
-    turquoise: '💎',
-    other: '📋'
-  };
-  return map[id] || '📌';
-};
-
-const switchTab = (tab: string) => {
-  currentTab.value = tab;
-};
-
-const filteredInfos = computed(() => {
-  if (currentTab.value === 'all') return infoList.value;
-  return infoList.value.filter(item => {
-    if (currentTab.value === 'house') return item.category_name === '房屋租售';
-    if (currentTab.value === 'idle') return item.category_name === '二手闲置';
-    if (currentTab.value === 'turquoise') return item.category_name === '绿松石名片';
-    return true;
-  });
-});
-
 const onSearch = () => {
-  if (!searchKeyword.value.trim()) return;
-  uni.showToast({ title: `搜: ${searchKeyword.value}`, icon: 'none' });
+  const kw = searchKeyword.value.trim();
+  if (!kw) {
+    uni.navigateTo({ url: '/pages/search/index' });
+    return;
+  }
+  uni.navigateTo({ url: `/pages/search/index?keyword=${encodeURIComponent(kw)}` });
+};
+
+const onBannerClick = () => {
+  uni.navigateTo({ url: '/pages/business/advertise' });
 };
 
 const onCategoryClick = (catId: string) => {
   uni.navigateTo({ url: `/pages/info/list?catId=${catId}` });
 };
 
-const goToShopBenefit = (shopId: string) => {
-  uni.navigateTo({ url: `/pages/benefit/shop?shopId=${shopId}` });
-};
-
-const goToInfoDetail = (id: string) => {
-  uni.navigateTo({ url: `/pages/info/detail?id=${id}` });
+const goToAlliance = () => {
+  uni.navigateTo({ url: '/pages/benefit/alliance' });
 };
 
 const goToPublish = () => {
   uni.navigateTo({ url: '/pages/info/publish' });
 };
 
-const goToMerchantApply = () => {
-  uni.navigateTo({ url: '/pages/merchant/apply' });
+const goToInfoList = () => {
+  uni.navigateTo({ url: '/pages/info/list' });
+};
+
+const goToInfoDetail = (id: string) => {
+  uni.navigateTo({ url: `/pages/info/detail?id=${id}` });
 };
 </script>
 
 <style scoped>
 .container {
   min-height: 100vh;
-  background-color: #F4F5F7;
-  padding-bottom: 120rpx;
+  background-color: #F6F8F7;
+  padding: 16rpx 24rpx 80rpx;
+  box-sizing: border-box;
 }
 
-.top-bar {
-  display: flex;
-  align-items: center;
-  padding: 20rpx 24rpx;
-  background: #ffffff;
-  gap: 16rpx;
-  border-bottom: 1rpx solid #E5E7EB;
+/* 1. 顶部手绘漫画广告横幅 */
+.banner-section {
+  width: 100%;
+  margin-bottom: 20rpx;
 }
 
-.town-picker {
+.banner-card {
+  position: relative;
+  width: 100%;
+  height: 280rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 10rpx 24rpx rgba(224, 155, 30, 0.18);
+}
+
+.banner-bg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.banner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx 28rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  z-index: 2;
+}
+
+.banner-tag {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  color: #78350F;
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 4rpx 14rpx;
+  border-radius: 16rpx;
+}
+
+.banner-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+}
+
+.title-line {
+  font-size: 38rpx;
+  font-weight: 900;
+  color: #1F2937;
+  line-height: 1.15;
+  letter-spacing: 1rpx;
+}
+
+.banner-sub {
+  font-size: 20rpx;
+  color: #4B5563;
+  font-weight: 500;
+}
+
+.banner-btn {
+  background: #111827;
+  color: #FFFFFF;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
   display: flex;
   align-items: center;
-  background: #F3F4F6;
-  padding: 12rpx 18rpx;
-  border-radius: 30rpx;
   gap: 6rpx;
 }
 
-.location-icon {
+.btn-text {
+  font-size: 22rpx;
+  font-weight: 600;
+}
+
+.btn-arrow {
   font-size: 24rpx;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* 2. 标语与乡镇定位 */
+.subbar-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+  padding: 0 4rpx;
+}
+
+.slogan-text {
+  font-size: 22rpx;
+  color: #6B7280;
+  font-weight: 500;
+}
+
+.town-capsule {
+  display: flex;
+  align-items: center;
+  background: #E8F5EF;
+  padding: 8rpx 20rpx;
+  border-radius: 30rpx;
+  gap: 8rpx;
+}
+
+.location-pin {
+  font-size: 22rpx;
 }
 
 .town-name {
-  font-size: 24rpx;
+  font-size: 22rpx;
   font-weight: 600;
-  color: #1F2937;
+  color: #17664C;
 }
 
-.arrow {
-  font-size: 16rpx;
-  color: #9CA3AF;
+.dropdown-arrow {
+  font-size: 18rpx;
+  color: #17664C;
+}
+
+/* 3. 搜索栏 */
+.search-section {
+  margin-bottom: 24rpx;
 }
 
 .search-box {
-  flex: 1;
   display: flex;
   align-items: center;
-  background: #F3F4F6;
-  padding: 10rpx 20rpx;
-  border-radius: 30rpx;
-  gap: 12rpx;
+  background: #FFFFFF;
+  border-radius: 36rpx;
+  padding: 12rpx 24rpx;
+  border: 1.5rpx solid #E5E7EB;
+  gap: 14rpx;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.03);
 }
 
-.search-icon {
-  font-size: 24rpx;
+.search-ico {
+  width: 28rpx;
+  height: 28rpx;
+  opacity: 0.6;
 }
 
 .search-input {
+  flex: 1;
   font-size: 24rpx;
-  width: 100%;
+  color: #1F2937;
 }
 
+.search-ph {
+  color: #9CA3AF;
+  font-size: 24rpx;
+}
+
+.search-btn {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #17664C;
+  padding-left: 14rpx;
+  border-left: 1rpx solid #E5E7EB;
+}
+
+/* 卡片统一白色圆角容器 */
+.card-wrap {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 24rpx 24rpx 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.04);
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24rpx;
+}
+
+.head-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.en-sub {
+  font-size: 18rpx;
+  font-weight: 700;
+  color: #9CA3AF;
+  letter-spacing: 2rpx;
+}
+
+.main-title {
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #111827;
+}
+
+.head-right-tip {
+  font-size: 22rpx;
+  color: #9CA3AF;
+}
+
+/* 4. 分类金刚区九宫格 */
 .category-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  background: #ffffff;
-  padding: 28rpx 10rpx;
-  margin-bottom: 20rpx;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28rpx 16rpx;
+  padding: 10rpx 0;
 }
 
 .grid-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: transform 0.15s ease;
 }
 
-.icon-circle {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 40rpx;
-  background: #EFF6FF;
+.item-hover {
+  transform: scale(0.96);
+  opacity: 0.9;
+}
+
+.cat-icon-circle {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 10rpx;
+  margin-bottom: 12rpx;
 }
 
-.grid-icon {
-  font-size: 36rpx;
+.cat-img {
+  width: 52rpx;
+  height: 52rpx;
 }
 
-.grid-label {
-  font-size: 20rpx;
-  color: #4B5563;
-  font-weight: 500;
+.cat-badge-txt {
+  font-size: 38rpx;
+  font-weight: 900;
 }
 
-.section-container {
-  padding: 0 24rpx;
+.cat-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #374151;
+}
+
+/* 5. 双色高对比行动大卡片 */
+.action-cards-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
   margin-bottom: 24rpx;
 }
 
-.section-header {
+.action-card {
+  position: relative;
+  height: 140rpx;
+  border-radius: 20rpx;
+  padding: 24rpx;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 16rpx;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease;
 }
 
-.title-wrap {
-  display: flex;
-  align-items: baseline;
-  gap: 12rpx;
+.card-hover {
+  transform: scale(0.98);
 }
 
-.section-title {
+.alliance-card {
+  background: linear-gradient(135deg, #125741, #1E795B);
+}
+
+.publish-card {
+  background: linear-gradient(135deg, #E85042, #F2675A);
+}
+
+.action-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.action-title {
   font-size: 32rpx;
-  font-weight: bold;
-  color: #111827;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: 1rpx;
 }
 
-.section-sub {
+.action-desc {
   font-size: 20rpx;
-  color: #9CA3AF;
-}
-
-.category-tabs {
-  display: flex;
-  gap: 16rpx;
-}
-
-.tab-item {
-  font-size: 24rpx;
-  color: #6B7280;
-  padding: 6rpx 16rpx;
-  border-radius: 20rpx;
-}
-
-.tab-item.active {
-  color: #2563EB;
-  background: #EFF6FF;
-  font-weight: 600;
-}
-
-.shops-scroll {
-  width: 100%;
-}
-
-.shops-wrap {
-  display: flex;
-  gap: 20rpx;
-  padding-bottom: 10rpx;
-}
-
-.featured-shop-card {
-  width: 320rpx;
-  flex-shrink: 0;
-  background: #ffffff;
-  border-radius: 16rpx;
-  overflow: hidden;
-  box-shadow: 0 4rpx 10rpx rgba(0, 0, 0, 0.05);
-}
-
-.shop-thumb {
-  width: 100%;
-  height: 180rpx;
-  background: #E5E7EB;
-}
-
-.shop-info {
-  padding: 16rpx;
-}
-
-.shop-name {
-  font-size: 26rpx;
-  font-weight: bold;
-  color: #1F2937;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-}
-
-.shop-hot {
-  font-size: 20rpx;
-  color: #DC2626;
-  margin-top: 6rpx;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.shop-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 14rpx;
-}
-
-.distance {
-  font-size: 20rpx;
-  color: #9CA3AF;
-}
-
-.go-btn {
-  font-size: 20rpx;
-  background: #2563EB;
-  color: #ffffff;
-  padding: 4rpx 14rpx;
-  border-radius: 20rpx;
+  color: rgba(255, 255, 255, 0.85);
   font-weight: 500;
 }
 
-.info-list {
+.action-bg-icon {
+  position: absolute;
+  right: 16rpx;
+  bottom: 12rpx;
+  width: 52rpx;
+  height: 52rpx;
+  opacity: 0.25;
+  filter: brightness(200%);
+}
+
+/* 6. 身边的新消息 */
+.more-link {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #17664C;
+}
+
+.link-arrow {
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+.feed-content {
   display: flex;
   flex-direction: column;
+  gap: 20rpx;
 }
 
-.fab-btn {
-  position: fixed;
-  right: 32rpx;
-  bottom: 140rpx;
-  background: linear-gradient(135deg, #2563EB, #1D4ED8);
-  color: #ffffff;
-  padding: 16rpx 28rpx;
-  border-radius: 40rpx;
-  box-shadow: 0 8rpx 20rpx rgba(37, 99, 235, 0.35);
+/* 雅致空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 24rpx;
+}
+
+.empty-icon-box {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 45rpx;
+  background: #E8F5EF;
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  justify-content: center;
+  font-size: 40rpx;
+  margin-bottom: 20rpx;
 }
 
-.fab-icon {
-  font-size: 32rpx;
-  font-weight: bold;
-}
-
-.fab-text {
-  font-size: 26rpx;
-  font-weight: 600;
-}
-
-.shop-recruiting-card {
-  background: linear-gradient(135deg, var(--zs-green, #17664c), var(--zs-green-dark, #104b39));
-  color: #ffffff;
-  border-radius: 20rpx;
-  padding: 30rpx 26rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 14rpx;
-  box-shadow: 0 6rpx 20rpx rgba(23, 102, 76, 0.12);
-}
-
-.recruiting-content {
-  flex: 1;
-  padding-right: 20rpx;
-}
-
-.recruiting-badge {
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.2);
-  color: #d2e8d9;
-  font-size: 18rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 10rpx;
-  font-weight: 600;
+.empty-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #1F2937;
   margin-bottom: 8rpx;
 }
 
-.recruiting-title {
-  font-size: 28rpx;
-  font-weight: bold;
-  line-height: 1.35;
-}
-
-.recruiting-sub {
-  font-size: 20rpx;
-  color: #c8e7d2;
-  margin-top: 6rpx;
+.empty-subtitle {
+  font-size: 22rpx;
+  color: #9CA3AF;
+  text-align: center;
+  margin-bottom: 28rpx;
   line-height: 1.4;
 }
 
-.recruiting-btn {
-  flex-shrink: 0;
-  background: var(--zs-orange, #db792e);
-  color: #ffffff;
-  font-size: 22rpx;
-  font-weight: bold;
-  padding: 12rpx 24rpx;
-  border-radius: 30rpx;
-}
-
-.info-empty-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20rpx 0 10rpx;
-}
-
-.empty-publish-action {
-  margin-top: 16rpx;
-  background: var(--zs-green-soft, #eaf4ee);
-  color: var(--zs-green, #17664c);
-  padding: 14rpx 36rpx;
-  border-radius: 30rpx;
+.empty-action-btn {
+  background: #FFFFFF;
+  border: 2rpx solid #17664C;
+  color: #17664C;
   font-size: 24rpx;
-  font-weight: bold;
+  font-weight: 600;
+  padding: 12rpx 36rpx;
+  border-radius: 30rpx;
+  box-shadow: 0 4rpx 12rpx rgba(23, 102, 76, 0.08);
 }
 </style>
