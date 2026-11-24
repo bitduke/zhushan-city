@@ -1,18 +1,57 @@
 {
+  "easycom": {
+    "custom": {
+      "^t-(.*)": "@tdesign/uniapp/$1/$1.vue"
+    }
+  },
   "pages": [
+    {
+      "path": "pages/welcome/index",
+      "style": {
+        "navigationBarTitleText": "欢迎使用"
+      }
+    },
     {
       "path": "pages/index/index",
       "style": {
-        "navigationBarTitleText": "竹山同城",
+        "navigationBarTitleText": "竹山街坊汇",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black",
         "enablePullDownRefresh": true
+      }
+    },
+    {
+      "path": "pages/search/index",
+      "style": {
+        "navigationBarTitleText": "搜索竹山"
+      }
+    },
+    {
+      "path": "pages/business/advertise",
+      "style": {
+        "navigationBarTitleText": "首页广告位招商",
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationBarTextStyle": "black"
       }
     },
     {
       "path": "pages/benefit/shop",
       "style": {
         "navigationBarTitleText": "门店专属福利",
-        "navigationBarBackgroundColor": "#1E3A8A",
+        "navigationBarBackgroundColor": "#17664C",
         "navigationBarTextStyle": "white"
+      }
+    },
+    {
+      "path": "pages/benefit/alliance",
+      "style": {
+        "navigationBarTitleText": "商圈联盟优惠"
+      }
+    },
+    {
+      "path": "pages/benefit/invalid",
+      "style": {
+        "navigationBarTitleText": "门店码暂不可用"
       }
     },
     {
@@ -48,9 +87,57 @@
       }
     },
     {
+      "path": "pages/info/mine",
+      "style": {
+        "navigationBarTitleText": "我的发布"
+      }
+    },
+    {
       "path": "pages/merchant/index",
       "style": {
         "navigationBarTitleText": "商家工作台"
+      }
+    },
+    {
+      "path": "pages/merchant/apply",
+      "style": {
+        "navigationBarTitleText": "商家入驻申请"
+      }
+    },
+    {
+      "path": "pages/merchant/list",
+      "style": {
+        "navigationBarTitleText": "本地商家"
+      }
+    },
+    {
+      "path": "pages/merchant/detail",
+      "style": {
+        "navigationBarTitleText": "商家详情"
+      }
+    },
+    {
+      "path": "pages/merchant/manage",
+      "style": {
+        "navigationBarTitleText": "店铺资料管理"
+      }
+    },
+    {
+      "path": "pages/merchant/coupons",
+      "style": {
+        "navigationBarTitleText": "本店优惠券管理"
+      }
+    },
+    {
+      "path": "pages/merchant/staff",
+      "style": {
+        "navigationBarTitleText": "门店员工权限"
+      }
+    },
+    {
+      "path": "pages/merchant/join",
+      "style": {
+        "navigationBarTitleText": "接受员工邀请"
       }
     },
     {
@@ -72,39 +159,77 @@
       }
     },
     {
+      "path": "pages/merchant/cooperation",
+      "style": {
+        "navigationBarTitleText": "拓客合作与对账"
+      }
+    },
+    {
       "path": "pages/user/index",
       "style": {
         "navigationBarTitleText": "个人中心"
+      }
+    },
+    {
+      "path": "pages/help/privacy",
+      "style": {
+        "navigationBarTitleText": "隐私说明"
+      }
+    },
+    {
+      "path": "pages/help/terms",
+      "style": {
+        "navigationBarTitleText": "用户服务协议"
+      }
+    },
+    {
+      "path": "pages/help/contact",
+      "style": {
+        "navigationBarTitleText": "帮助与反馈"
+      }
+    },
+    {
+      "path": "pages/admin/index",
+      "style": {
+        "navigationBarTitleText": "运营管理台"
       }
     }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "竹山同城",
+    "navigationBarTitleText": "竹山街坊汇",
     "navigationBarBackgroundColor": "#FFFFFF",
-    "backgroundColor": "#F3F4F6"
+    "backgroundColor": "#F6F7F2"
   },
   "tabBar": {
     "color": "#6B7280",
-    "selectedColor": "#2563EB",
+    "selectedColor": "#17664C",
     "borderStyle": "black",
     "backgroundColor": "#FFFFFF",
     "list": [
       {
         "pagePath": "pages/index/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "static/icons/tab-house.png",
+        "selectedIconPath": "static/icons/tab-house-active.png"
       },
       {
         "pagePath": "pages/coupon/mine",
-        "text": "券包"
+        "text": "券包",
+        "iconPath": "static/icons/tab-ticket.png",
+        "selectedIconPath": "static/icons/tab-ticket-active.png"
       },
       {
-        "pagePath": "pages/merchant/index",
-        "text": "商家"
+        "pagePath": "pages/merchant/list",
+        "text": "逛店",
+        "iconPath": "static/icons/tab-store.png",
+        "selectedIconPath": "static/icons/tab-store-active.png"
       },
       {
         "pagePath": "pages/user/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "static/icons/tab-user.png",
+        "selectedIconPath": "static/icons/tab-user-active.png"
       }
     ]
   }

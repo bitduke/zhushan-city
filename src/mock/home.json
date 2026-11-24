@@ -1,11 +1,4 @@
 {
-  "banners": [
-    {
-      "id": "b1",
-      "image": "/static/banner1.png",
-      "title": "竹山商圈联盟·进店扫码享好礼"
-    }
-  ],
   "featured_shops": [
     {
       "id": "shop_001",
@@ -73,15 +66,15 @@
     },
     {
       "_id": "info_103",
-      "title": "竹山国际绿松石城实体老店，源头一手原矿高瓷蓝绿",
-      "category_name": "绿松石名片",
-      "town": "麻家渡镇",
-      "price_desc": "进店品鉴",
-      "author_name": "秦石坊工艺",
-      "contact_phone": "13572666666",
+      "title": "竹山城区沿街店面转让，设备齐全可面谈",
+      "category_name": "转让/合作",
+      "town": "城关镇",
+      "price_desc": "转让条件面议",
+      "author_name": "演示商户",
+      "contact_phone": "",
       "created_at": "1小时前",
       "view_count": 310,
-      "images": ["https://picsum.photos/400/300?random=13"]
+      "images": []
     }
   ]
 }

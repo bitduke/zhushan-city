@@ -1,9 +1,12 @@
 <template>
   <view class="ranking-page">
     <view class="header-box">
-      <view class="title">🏆 竹山商圈引流贡献榜</view>
-      <view class="desc">基于近 30 天真实跨店核销新客数据 · 每日凌晨结算更新</view>
+      <text class="header-kicker">LOCAL PARTNERS</text>
+      <view class="title">竹山商圈引流榜</view>
+      <view class="desc">最近 30 天 · 仅统计双方确认的有效新客；少于 5 次领券不生成名次</view>
     </view>
+
+    <view class="rank-item" v-if="rankingList.length === 0">暂无经核对的引流结果，暂不生成名次。</view>
 
     <view class="rank-list">
       <view 
@@ -12,15 +15,16 @@
         :key="item.merchant_id"
       >
         <view class="rank-idx" :class="'top-' + (idx + 1)">
-          {{ idx + 1 }}
+          {{ item.sample_size >= 5 ? idx + 1 : '—' }}
         </view>
 
-        <image class="rank-avatar" :src="item.avatar" mode="aspectFill" />
+        <image v-if="hasAvatar(item)" class="rank-avatar" :src="item.avatar" mode="aspectFill" @error="failedAvatars[item.merchant_id] = true" />
+        <view v-else class="rank-avatar avatar-fallback"><image :src="'/static/icons/store.png'" mode="aspectFit" /></view>
 
         <view class="rank-info">
           <view class="name-row">
             <text class="rank-name">{{ item.merchant_name }}</text>
-            <text class="new-tag" v-if="item.is_new_partner">新上榜</text>
+            <text class="new-tag" v-if="item.is_new_partner">样本不足</text>
           </view>
           <view class="cat-row">
             <text class="cat">{{ item.town }} · {{ item.category_name }}</text>
@@ -30,13 +34,13 @@
 
         <view class="rank-data">
           <view class="data-val">{{ item.total_brought_guests }} <text class="sub">人</text></view>
-          <view class="rate">带客转化率 {{ item.conversion_rate }}%</view>
+          <view class="rate">{{ item.sample_size >= 5 ? `确认转化率 ${item.conversion_rate}%（${item.sample_size} 次领券）` : `${item.sample_size} 次领券，暂不计算转化率` }}</view>
         </view>
       </view>
     </view>
 
     <view class="rule-footer">
-      <text class="rule-tip">ℹ️ 统计规则：严格依据顾客出示合作券并由目标店实际核销完成为有效引流新客，自刷与老客经核对已剔除。</text>
+      <text class="rule-tip">扫码、领券和核销分别记录；有效新客须由合作双方核对。</text>
     </view>
   </view>
 </template>
@@ -46,6 +50,8 @@ import { ref, onMounted } from 'vue';
 import { getPromoterRanking } from '@/api/ranking';
 
 const rankingList = ref<any[]>([]);
+const failedAvatars = ref<Record<string, boolean>>({});
+const hasAvatar = (item: any) => !!item.avatar && !item.avatar.includes('picsum.photos') && !failedAvatars.value[item.merchant_id];
 
 onMounted(async () => {
   try {
@@ -59,17 +65,18 @@ onMounted(async () => {
 <style scoped>
 .ranking-page {
   min-height: 100vh;
-  background-color: #F4F5F7;
+  background-color: var(--zs-canvas);
   padding: 24rpx;
 }
 
 .header-box {
-  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  background: linear-gradient(135deg, var(--zs-green-dark), var(--zs-green));
   color: #ffffff;
   padding: 32rpx;
   border-radius: 20rpx;
   margin-bottom: 24rpx;
 }
+.header-kicker { color: #c8e7d2; font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
 
 .title {
   font-size: 32rpx;
@@ -95,7 +102,9 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+  border: 1rpx solid var(--zs-border);
+  box-shadow: 0 4rpx 16rpx rgba(21,57,38,.035);
 }
 
 .rank-idx {
@@ -132,9 +141,12 @@ onMounted(async () => {
   border-radius: 12rpx;
   background: #E5E7EB;
 }
+.avatar-fallback { display: flex; align-items: center; justify-content: center; background: var(--zs-green-soft); }
+.avatar-fallback image { width: 51rpx; height: 51rpx; }
 
 .rank-info {
   flex: 1;
+  min-width: 0;
 }
 
 .name-row {
@@ -169,13 +181,19 @@ onMounted(async () => {
 }
 
 .rank-data {
-  text-align: right;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12rpx;
+  width: 100%;
+  padding-top: 12rpx;
+  border-top: 1rpx solid var(--zs-border);
 }
 
 .data-val {
   font-size: 32rpx;
   font-weight: 900;
-  color: #2563EB;
+  color: var(--zs-green);
 }
 
 .sub {

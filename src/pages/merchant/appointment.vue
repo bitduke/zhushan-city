@@ -1,16 +1,23 @@
 <template>
   <view class="appoint-manage-page">
-    <view class="page-title">📝 客户预约接待处理</view>
+    <view class="zs-page-hero">
+      <text class="zs-page-hero__kicker">APPOINTMENTS</text>
+      <view class="zs-page-hero__title">预约接待</view>
+      <text class="zs-page-hero__subtitle">确认时段，记录顾客是否到店</text>
+    </view>
+    <view v-if="accessMessage" class="access-note">{{ accessMessage }}</view>
+    <t-empty v-else-if="appointments.length === 0" description="本店暂无预约记录" />
 
-    <view class="list-wrap">
-      <view class="appoint-card" v-for="item in appointments" :key="item.id">
+    <view v-if="!accessMessage" class="list-wrap">
+      <view class="appoint-card" v-for="item in appointments" :key="item._id">
         <view class="card-head">
-          <text class="user-phone">客户：{{ item.contact_name }} ({{ item.contact_phone }})</text>
+          <text class="user-phone">客户：{{ item.contact_name }}（{{ item.contact_phone || '未提供电话' }}）</text>
           <text class="status-pill" :class="item.status">{{ getStatusText(item.status) }}</text>
         </view>
 
         <view class="item-title">{{ item.coupon_title }}</view>
-        <view class="time-row">期望时段：{{ item.requested_time }}</view>
+        <view class="time-row">期望时段：{{ item.requested_time_slot }}</view>
+        <view class="time-row" v-if="item.reject_reason">拒绝原因：{{ item.reject_reason }}</view>
 
         <view class="action-bar" v-if="item.status === 'REQUESTED'">
           <button class="confirm-btn" @tap="confirmAppoint(item)">确认接单</button>
@@ -18,7 +25,8 @@
         </view>
 
         <view class="action-bar" v-else-if="item.status === 'CONFIRMED'">
-          <button class="arrive-btn" @tap="markArrived(item)">客户已到店 (核验)</button>
+          <button class="arrive-btn" @tap="markArrived(item)">客户已到店</button>
+          <button @tap="markNoShow(item)">标记未到店</button>
         </view>
       </view>
     </view>
@@ -27,77 +35,96 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
+import { USE_MOCK } from '@/api/adapter';
+import { useMerchantStore } from '@/store/merchant';
+import { getMerchantAppointments, confirmAppointment, rejectAppointment, markAppointmentArrived, markAppointmentNoShow } from '@/api/appointment';
+import type { Appointment } from '@/types/appointment';
 
-const appointments = ref([
-  {
-    id: 'apt_01',
-    contact_name: '张女士',
-    contact_phone: '138****1234',
-    coupon_title: '雅致老客专享·38元纯色美甲体验',
-    requested_time: '今天 15:30',
-    status: 'REQUESTED'
-  },
-  {
-    id: 'apt_02',
-    contact_name: '刘先生',
-    contact_phone: '139****5678',
-    coupon_title: '68元古法足道体验 (原价138元)',
-    requested_time: '今天 17:00',
-    status: 'CONFIRMED'
-  }
-]);
+const merchantStore = useMerchantStore();
+const appointments = ref<Appointment[]>([]);
+const accessMessage = ref('');
+
+const loadAppointments = async () => {
+  const merchant = merchantStore.currentMerchant;
+  appointments.value = [];
+  if (!merchant) { accessMessage.value = '当前没有可处理预约的门店。'; return; }
+  if (merchant.status !== 'APPROVED') { accessMessage.value = '门店尚未审核通过或已停用，暂不能处理预约。'; return; }
+  if (!USE_MOCK && !merchant.can_handle_appointment && merchant.access_role !== 'OWNER') { accessMessage.value = '当前账号没有本店预约处理权限。'; return; }
+  accessMessage.value = '';
+  try { appointments.value = await getMerchantAppointments(merchant._id); }
+  catch (error) { accessMessage.value = error instanceof Error ? error.message : '预约加载失败，请稍后再试。'; }
+};
+onShow(loadAppointments);
 
 const getStatusText = (status: string) => {
   if (status === 'REQUESTED') return '待确认';
   if (status === 'CONFIRMED') return '已确认待到店';
   if (status === 'ARRIVED') return '已到店';
+  if (status === 'REJECTED') return '已拒绝';
+  if (status === 'NO_SHOW') return '未到店';
   return '已完成';
 };
 
-const confirmAppoint = (item: any) => {
-  item.status = 'CONFIRMED';
-  uni.showToast({ title: '已确认接单，系统已微信通知客户', icon: 'success' });
+const confirmAppoint = async (item: Appointment) => {
+  try {
+    await confirmAppointment(item._id, merchantStore.currentMerchant!._id);
+    await loadAppointments();
+    uni.showToast({ title: USE_MOCK ? '预约已确认（本地演示）' : '预约已确认', icon: 'none' });
+  } catch (err) {
+    uni.showToast({ title: err instanceof Error ? err.message : '确认失败', icon: 'none' });
+  }
 };
 
-const rejectAppoint = (item: any) => {
+const rejectAppoint = (item: Appointment) => {
   uni.showModal({
     title: '婉拒预约',
     content: '确定该时段接待已满？',
-    success: (res) => {
+    success: async (res) => {
       if (res.confirm) {
-        appointments.value = appointments.value.filter(a => a.id !== item.id);
-        uni.showToast({ title: '已拒绝并通知客户', icon: 'none' });
+        try {
+          await rejectAppointment(item._id, merchantStore.currentMerchant!._id, '该时段接待已满');
+          await loadAppointments();
+          uni.showToast({ title: USE_MOCK ? '已拒绝预约（本地演示）' : '已拒绝预约', icon: 'none' });
+        } catch (err) {
+          uni.showToast({ title: err instanceof Error ? err.message : '拒绝失败', icon: 'none' });
+        }
       }
     }
   });
 };
 
-const markArrived = (item: any) => {
-  item.status = 'ARRIVED';
-  uni.showToast({ title: '已标记到店，可进行扫码核销', icon: 'success' });
+const markArrived = async (item: Appointment) => {
+  try {
+    await markAppointmentArrived(item._id, merchantStore.currentMerchant!._id);
+    await loadAppointments();
+    uni.showToast({ title: '已标记到店，可进行核销', icon: 'none' });
+  } catch (err) {
+    uni.showToast({ title: err instanceof Error ? err.message : '标记失败', icon: 'none' });
+  }
+};
+
+const markNoShow = async (item: Appointment) => {
+  try { await markAppointmentNoShow(item._id, merchantStore.currentMerchant!._id); await loadAppointments(); uni.showToast({ title: '已标记未到店', icon: 'none' }); }
+  catch (error) { uni.showToast({ title: error instanceof Error ? error.message : '标记失败', icon: 'none' }); }
 };
 </script>
 
 <style scoped>
 .appoint-manage-page {
   min-height: 100vh;
-  background-color: #F4F5F7;
+  background-color: var(--zs-canvas);
   padding: 24rpx;
 }
-
-.page-title {
-  font-size: 30rpx;
-  font-weight: bold;
-  color: #111827;
-  margin-bottom: 20rpx;
-}
+.access-note { margin-top: 22rpx; padding: 22rpx; border-radius: 15rpx; color: var(--zs-muted); background: white; font-size: 23rpx; line-height: 1.5; }
 
 .appoint-card {
   background: #ffffff;
-  border-radius: 16rpx;
+  border-radius: 18rpx;
   padding: 24rpx;
-  margin-bottom: 20rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+  margin-bottom: 16rpx;
+  border: 1rpx solid var(--zs-border);
+  box-shadow: 0 4rpx 16rpx rgba(21,57,38,.035);
 }
 
 .card-head {
@@ -122,11 +149,6 @@ const markArrived = (item: any) => {
 .status-pill.REQUESTED {
   background: #FEF3C7;
   color: #B45309;
-}
-
-.status-pill.CONFIRMED {
-  background: #EFF6FF;
-  color: #2563EB;
 }
 
 .status-pill.ARRIVED {
@@ -155,7 +177,7 @@ const markArrived = (item: any) => {
 }
 
 .confirm-btn {
-  background: #2563EB;
+  background: var(--zs-green);
   color: #ffffff;
   font-size: 22rpx;
   height: 56rpx;

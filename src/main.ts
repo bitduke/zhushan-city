@@ -1,6 +1,8 @@
 import { createSSRApp } from 'vue';
 import * as Pinia from 'pinia';
 import App from './App.vue';
+import '@tdesign/uniapp/theme.css';
+import './styles/brand.css';
 
 export function createApp() {
   const app = createSSRApp(App);

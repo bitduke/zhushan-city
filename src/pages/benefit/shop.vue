@@ -15,8 +15,11 @@
       </view>
 
       <view class="address-bar">
-        <text class="addr-text">📍 {{ merchant.address }}</text>
-        <button class="call-small" @tap="callShop">电话</button>
+        <text class="addr-text" @tap="openLocation">📍 {{ merchant.address }}</text>
+        <view class="action-btn-group">
+          <button class="nav-small" @tap="openLocation">导航</button>
+          <button class="call-small" @tap="callShop">电话</button>
+        </view>
       </view>
     </view>
 
@@ -119,6 +122,22 @@ onLoad(async (options) => {
 const callShop = () => {
   if (merchant.value?.phone) {
     uni.makePhoneCall({ phoneNumber: merchant.value.phone });
+  }
+};
+
+const openLocation = () => {
+  if (merchant.value?.lat && merchant.value?.lng) {
+    uni.openLocation({
+      latitude: Number(merchant.value.lat),
+      longitude: Number(merchant.value.lng),
+      name: merchant.value.name,
+      address: merchant.value.address
+    });
+  } else if (merchant.value?.address) {
+    uni.setClipboardData({
+      data: merchant.value.address,
+      success: () => uni.showToast({ title: '门店地址已复制', icon: 'none' })
+    });
   }
 };
 
@@ -254,10 +273,29 @@ const handleClaimCross = async (coupon: any) => {
 .addr-text {
   font-size: 22rpx;
   opacity: 0.95;
-  max-width: 520rpx;
+  flex: 1;
+  min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.action-btn-group {
+  display: flex;
+  gap: 10rpx;
+  flex-shrink: 0;
+}
+
+.nav-small {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 20rpx;
+  padding: 0 18rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  border-radius: 22rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.4);
+  margin: 0;
 }
 
 .call-small {
@@ -269,6 +307,7 @@ const handleClaimCross = async (coupon: any) => {
   line-height: 44rpx;
   border-radius: 22rpx;
   border: none;
+  margin: 0;
 }
 
 .section-box {

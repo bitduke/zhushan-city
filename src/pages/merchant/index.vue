@@ -1,55 +1,89 @@
 <template>
   <view class="merchant-page">
+    <view class="zs-page-hero">
+      <text class="zs-page-hero__kicker">MERCHANT DESK</text>
+      <view class="zs-page-hero__title">商家工作台</view>
+      <text class="zs-page-hero__subtitle">核销、预约和合作记录都在这里</text>
+    </view>
+    <view class="board-card" v-if="USE_MOCK">
+      <text>本地演示：切换门店以测试预约和核销，记录只保存在此设备</text>
+      <picker :range="demoMerchantNames" :value="selectedMerchantIndex" @change="changeDemoMerchant">
+        <view class="preview-btn">当前演示门店：{{ merchant?.name }} ▼</view>
+      </picker>
+    </view>
+    <view class="board-card" v-if="!USE_MOCK && demoMerchants.length > 1">
+      <picker :range="demoMerchantNames" :value="selectedMerchantIndex" @change="changeDemoMerchant">
+        <view class="preview-btn">当前门店：{{ merchant?.name }} ▼</view>
+      </picker>
+    </view>
     <!-- 商家头部名片 -->
     <view class="merchant-card" v-if="merchant">
       <view class="info-row">
-        <image class="shop-avatar" :src="merchant.avatar" mode="aspectFill" />
+        <image v-if="showAvatar" class="shop-avatar" :src="merchant.avatar" mode="aspectFill" @error="avatarFailed = true" />
+        <view v-else class="shop-avatar avatar-fallback"><image :src="'/static/icons/store.png'" mode="aspectFit" /></view>
         <view class="shop-meta">
           <view class="shop-name-wrap">
             <text class="shop-name">{{ merchant.name }}</text>
-            <text class="verified-tag">已认证联盟店</text>
+            <text class="verified-tag">{{ USE_MOCK ? '演示门店' : merchant.status === 'APPROVED' ? '已审核' : '审核中' }}</text>
           </view>
-          <text class="shop-town">📍 {{ merchant.town }} · {{ merchant.category_name }}</text>
+          <text class="shop-town">{{ merchant.town }} · {{ merchant.category_name }}</text>
         </view>
       </view>
 
-      <view class="qr-action-bar">
-        <text class="qr-text">本店专属福利码已激活</text>
+      <view class="qr-action-bar" v-if="merchant.status === 'APPROVED'">
+        <text class="qr-text">福利页 · 门店码 {{ merchant.qrcode_token || '待生成' }}</text>
         <button class="preview-btn" @tap="previewBenefitPage">预览顾客端</button>
+        <button v-if="!USE_MOCK" class="preview-btn" @tap="showMerchantCode">生成／查看小程序码</button>
+      </view>
+      <view v-if="!USE_MOCK && codeUrl" class="code-panel">
+        <image class="code-image" :src="codeUrl" mode="aspectFit" />
+        <text class="code-hint">{{ codeVersion === 'release' ? '正式版门店码；张贴前请真机扫码核对门店。' : '开发／体验版门店码，仅供联调；正式发布后需重新生成。' }}</text>
       </view>
     </view>
 
     <!-- 今日核心数据看板 (基于 PRD 真实指标) -->
-    <view class="board-card">
+    <view class="board-card" v-if="merchant && USE_MOCK">
       <view class="board-header">
-        <text class="board-title">📊 今日经营数据</text>
-        <text class="board-date">实时更新</text>
+        <text class="board-title">本地演示记录</text>
+        <text class="board-date">仅供流程测试</text>
       </view>
 
       <view class="data-grid">
         <view class="data-item">
-          <text class="num">45</text>
-          <text class="label">进店扫码人数</text>
+          <text class="num">{{ mockCounts.scans }}</text>
+          <text class="label">本店码去重扫码</text>
         </view>
         <view class="data-item">
-          <text class="num highlight">18</text>
-          <text class="label">当场核销量</text>
+          <text class="num">{{ mockCounts.claimed }}</text>
+          <text class="label">本店领券数</text>
         </view>
         <view class="data-item">
-          <text class="num blue">12</text>
-          <text class="label">帮他店引流数</text>
+          <text class="num highlight">{{ mockCounts.verified }}</text>
+          <text class="label">本店核销量</text>
         </view>
         <view class="data-item">
-          <text class="num green">3</text>
-          <text class="label">带来到店新客</text>
+          <text class="num blue">{{ mockCounts.crossClaims }}</text>
+          <text class="label">从本店页领合作券</text>
+        </view>
+        <view class="data-item">
+          <text class="num green">{{ mockCounts.confirmedGuests }}</text>
+          <text class="label">{{ merchant._id === 'shop_001' ? '双方确认的带出新客' : '双方确认的收到新客' }}</text>
         </view>
       </view>
     </view>
 
     <!-- 核心操作功能区 -->
-    <view class="action-grid">
-      <view class="menu-card primary-action" @tap="goToVerify">
-        <text class="menu-icon">📷</text>
+    <view class="action-grid" v-if="merchant && merchant.status === 'APPROVED'">
+      <view class="menu-card" v-if="canManage" @tap="goToManage">
+        <view class="menu-icon"><image :src="'/static/icons/store.png'" mode="aspectFit" /></view>
+        <view class="menu-text"><text class="menu-title">店铺资料</text><text class="menu-desc">营业时间、地址与审核状态</text></view>
+      </view>
+      <view class="menu-card" v-if="canManage" @tap="goToCoupons">
+        <view class="menu-icon"><image :src="'/static/icons/ticket.png'" mode="aspectFit" /></view>
+        <view class="menu-text"><text class="menu-title">优惠券管理</text><text class="menu-desc">建券、上架和暂停新领券</text></view>
+      </view>
+      <view class="menu-card primary-action" v-if="canVerify" @tap="goToVerify">
+        <view class="menu-icon"><image :src="'/static/icons/search.png'" mode="aspectFit" /></view>
         <view class="menu-text">
           <text class="menu-title">扫码 / 输码核销</text>
           <text class="menu-desc">验证顾客优惠券并出库</text>
@@ -57,38 +91,106 @@
       </view>
 
       <view class="menu-card" @tap="goToRanking">
-        <text class="menu-icon">🏆</text>
+        <view class="menu-icon"><image :src="'/static/icons/gem.png'" mode="aspectFit" /></view>
         <view class="menu-text">
           <text class="menu-title">商圈引流榜</text>
-          <text class="menu-desc">查看带客排行与合作机会</text>
+          <text class="menu-desc">查看经核对的引流结果</text>
         </view>
       </view>
 
-      <view class="menu-card" @tap="goToAppointment">
-        <text class="menu-icon">📝</text>
+      <view class="menu-card" v-if="canAppointment" @tap="goToAppointment">
+        <view class="menu-icon"><image :src="'/static/icons/clipboard.png'" mode="aspectFit" /></view>
         <view class="menu-text">
           <text class="menu-title">预约处理</text>
           <text class="menu-desc">接单确认与到店核验</text>
         </view>
       </view>
 
-      <view class="menu-card" @tap="goToCooperation">
-        <text class="menu-icon">🤝</text>
+      <view class="menu-card" v-if="canManage" @tap="goToCooperation">
+        <view class="menu-icon"><image :src="'/static/icons/box.png'" mode="aspectFit" /></view>
         <view class="menu-text">
-          <text class="menu-title">拓客合作管理</text>
-          <text class="menu-desc">购买推广 / 查看对账单</text>
+          <text class="menu-title">拓客合作与对账</text>
+          <text class="menu-desc">发布、接受、核对结果与收付</text>
         </view>
       </view>
+      <view class="menu-card" v-if="canManage" @tap="goToStaff">
+        <view class="menu-icon"><image :src="'/static/icons/user.png'" mode="aspectFit" /></view>
+        <view class="menu-text"><text class="menu-title">员工权限</text><text class="menu-desc">邀请并停用本店员工</text></view>
+      </view>
     </view>
+    <view v-if="!merchant" class="board-card">当前账号尚无已审核商家，无法使用商家工作台。</view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import { useMerchantStore } from '@/store/merchant';
+import { USE_MOCK } from '@/api/adapter';
+import { readMockState } from '@/api/mockState';
+import { getMyMerchants } from '@/api/merchant';
+import { getMerchantCodeImage } from '@/api/merchantCode';
+import type { Merchant } from '@/types/merchant';
 
 const merchantStore = useMerchantStore();
 const merchant = computed(() => merchantStore.currentMerchant);
+const avatarFailed = ref(false);
+const showAvatar = computed(() => !!merchant.value?.avatar && !merchant.value.avatar.includes('picsum.photos') && !avatarFailed.value);
+const canManage = computed(() => USE_MOCK || merchant.value?.access_role === 'OWNER');
+const canVerify = computed(() => USE_MOCK || !!merchant.value?.can_verify);
+const canAppointment = computed(() => USE_MOCK || !!merchant.value?.can_handle_appointment);
+const demoMerchants = ref<Merchant[]>([]);
+const demoMerchantNames = computed(() => demoMerchants.value.map(item => item.name));
+const selectedMerchantIndex = computed(() => Math.max(0, demoMerchants.value.findIndex(item => item._id === merchant.value?._id)));
+const mockCounts = ref({ scans: 0, claimed: 0, verified: 0, crossClaims: 0, confirmedGuests: 0 });
+const codeUrl = ref('');
+const codeVersion = ref('develop');
+
+const refreshCounts = async () => {
+  if (!USE_MOCK) {
+    try {
+      demoMerchants.value = await getMyMerchants();
+      if (!demoMerchants.value.some(item => item._id === merchant.value?._id)) merchantStore.setCurrentMerchant(demoMerchants.value[0] || null);
+    } catch (error) { uni.showToast({ title: error instanceof Error ? error.message : '店铺加载失败', icon: 'none' }); }
+    return;
+  }
+  const state = readMockState();
+  demoMerchants.value = state.merchants.filter(item => item.status === 'APPROVED');
+  if (!demoMerchants.value.some(item => item._id === merchant.value?._id)) {
+    merchantStore.setCurrentMerchant(demoMerchants.value[0] || null);
+  }
+  if (!merchant.value) return;
+  const id = merchant.value._id;
+  mockCounts.value = {
+    scans: state.scanLogs.filter(item => item.source_merchant_id === id).length,
+    claimed: state.coupons.filter(item => item.merchant_id === id).length,
+    verified: state.verifyLogs.filter(item => item.merchant_id === id).length,
+    crossClaims: state.coupons.filter(item => item.source_merchant_id === id && item.merchant_id !== id).length,
+    confirmedGuests: state.cooperationResults.filter(item => item.status === 'CONFIRMED' && (id === 'shop_001' ? item.promoter_merchant_id === id : item.buyer_merchant_id === id)).length
+  };
+};
+onShow(refreshCounts);
+
+const changeDemoMerchant = (event: any) => {
+  const selected = demoMerchants.value[Number(event.detail.value)];
+  if (!selected) return;
+  merchantStore.setCurrentMerchant(selected);
+  avatarFailed.value = false;
+  codeUrl.value = '';
+  refreshCounts();
+};
+
+const showMerchantCode = async () => {
+  if (USE_MOCK || !merchant.value) return;
+  try {
+    uni.showLoading({ title: '生成门店码...' });
+    const result = await getMerchantCodeImage(merchant.value._id);
+    codeUrl.value = result.url;
+    codeVersion.value = result.envVersion;
+  } catch (error) {
+    uni.showToast({ title: error instanceof Error ? error.message : '门店码生成失败', icon: 'none' });
+  } finally { uni.hideLoading(); }
+};
 
 const previewBenefitPage = () => {
   uni.navigateTo({
@@ -100,6 +202,10 @@ const goToVerify = () => {
   uni.navigateTo({ url: '/pages/merchant/verify' });
 };
 
+const goToManage = () => uni.navigateTo({ url: '/pages/merchant/manage' });
+const goToCoupons = () => uni.navigateTo({ url: '/pages/merchant/coupons' });
+const goToStaff = () => uni.navigateTo({ url: '/pages/merchant/staff' });
+
 const goToRanking = () => {
   uni.navigateTo({ url: '/pages/merchant/ranking' });
 };
@@ -109,14 +215,14 @@ const goToAppointment = () => {
 };
 
 const goToCooperation = () => {
-  uni.showToast({ title: '拓客合作对账单已锁定', icon: 'none' });
+  uni.navigateTo({ url: '/pages/merchant/cooperation' });
 };
 </script>
 
 <style scoped>
 .merchant-page {
   min-height: 100vh;
-  background-color: #F4F5F7;
+  background-color: var(--zs-canvas);
   padding: 24rpx;
 }
 
@@ -125,7 +231,8 @@ const goToCooperation = () => {
   border-radius: 20rpx;
   padding: 28rpx;
   margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+  border: 1rpx solid var(--zs-border);
+  box-shadow: 0 4rpx 16rpx rgba(21,57,38,.035);
 }
 
 .info-row {
@@ -140,6 +247,8 @@ const goToCooperation = () => {
   border-radius: 16rpx;
   background: #E5E7EB;
 }
+.avatar-fallback { display: flex; align-items: center; justify-content: center; background: #eaf4ee; }
+.avatar-fallback image { width: 58rpx; height: 58rpx; }
 
 .shop-meta {
   flex: 1;
@@ -176,10 +285,15 @@ const goToCooperation = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12rpx;
   margin-top: 24rpx;
   padding-top: 20rpx;
   border-top: 1rpx solid #F3F4F6;
 }
+.code-panel { margin-top: 18rpx; text-align: center; }
+.code-image { width: 360rpx; height: 360rpx; }
+.code-hint { display: block; margin-top: 10rpx; color: #6b7280; font-size: 21rpx; }
 
 .qr-text {
   font-size: 22rpx;
@@ -187,8 +301,8 @@ const goToCooperation = () => {
 }
 
 .preview-btn {
-  background: #EFF6FF;
-  color: #2563EB;
+  background: var(--zs-green-soft);
+  color: var(--zs-green);
   font-size: 22rpx;
   height: 52rpx;
   line-height: 52rpx;
@@ -203,6 +317,7 @@ const goToCooperation = () => {
   border-radius: 20rpx;
   padding: 28rpx;
   margin-bottom: 24rpx;
+  border: 1rpx solid var(--zs-border);
 }
 
 .board-header {
@@ -225,7 +340,8 @@ const goToCooperation = () => {
 
 .data-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20rpx;
   text-align: center;
 }
 
@@ -245,7 +361,7 @@ const goToCooperation = () => {
 }
 
 .num.blue {
-  color: #2563EB;
+  color: var(--zs-green);
 }
 
 .num.green {
@@ -259,22 +375,23 @@ const goToCooperation = () => {
 }
 
 .action-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
 }
 
 .menu-card {
   background: #ffffff;
-  padding: 28rpx;
-  border-radius: 20rpx;
+  padding: 22rpx;
+  border-radius: 17rpx;
   display: flex;
   align-items: center;
   gap: 16rpx;
+  border: 1rpx solid var(--zs-border);
 }
 
 .primary-action {
-  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  background: linear-gradient(135deg, var(--zs-green-dark), var(--zs-green));
   color: #ffffff;
 }
 
@@ -287,8 +404,17 @@ const goToCooperation = () => {
 }
 
 .menu-icon {
-  font-size: 48rpx;
+  width: 58rpx;
+  height: 58rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14rpx;
+  background: var(--zs-green-soft);
 }
+.menu-icon image { width: 36rpx; height: 36rpx; }
+.primary-action .menu-icon { background: rgba(255,255,255,.88); }
 
 .menu-text {
   flex: 1;

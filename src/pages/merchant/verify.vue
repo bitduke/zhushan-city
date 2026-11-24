@@ -1,13 +1,19 @@
 <template>
   <view class="verify-page">
+    <view class="zs-page-hero">
+      <text class="zs-page-hero__kicker">VERIFY BENEFITS</text>
+      <view class="zs-page-hero__title">优惠券核销</view>
+      <text class="zs-page-hero__subtitle">扫码或输入券码，确认顾客权益</text>
+    </view>
+    <view class="scan-card demo-notice" v-if="USE_MOCK">本地演示核销，不会产生真实优惠或门店结算</view>
     <view class="scan-card">
       <view class="scan-header">
-        <text class="scan-title">📷 顾客优惠券核销</text>
+        <text class="scan-title">核销顾客卡券</text>
         <text class="shop-tag">{{ merchant?.name }}</text>
       </view>
 
       <button class="camera-btn" @tap="handleScanCode">
-        <text class="cam-icon">📱</text>
+        <image class="cam-icon" :src="'/static/icons/search.png'" mode="aspectFit" />
         <text class="cam-text">开启摄像头扫码核销</text>
       </button>
 
@@ -27,7 +33,7 @@
 
     <!-- 最近核销成功记录 -->
     <view class="history-card" v-if="historyList.length > 0">
-      <view class="hist-title">🕒 本次会话核销记录</view>
+      <view class="hist-title">本店核销记录</view>
       <view class="hist-item" v-for="(item, idx) in historyList" :key="idx">
         <view class="item-left">
           <text class="item-name">{{ item.coupon_title }}</text>
@@ -41,18 +47,32 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 import { useMerchantStore } from '@/store/merchant';
-import { verifyCoupon } from '@/api/coupon';
+import { verifyCoupon, getVerifyLogs } from '@/api/coupon';
+import { USE_MOCK } from '@/api/adapter';
 
 const merchantStore = useMerchantStore();
 const merchant = computed(() => merchantStore.currentMerchant);
 
 const inputCode = ref('');
 const historyList = ref<any[]>([]);
+const loadHistory = async () => {
+  historyList.value = merchant.value ? (await getVerifyLogs(merchant.value._id)).map(item => ({
+    coupon_title: item.coupon_title,
+    verify_time: new Date(item.verified_at).toLocaleString(),
+    code: item.coupon_code
+  })) : [];
+};
+onShow(loadHistory);
 
 const executeVerify = async (code: string) => {
   if (!code.trim()) {
     uni.showToast({ title: '请输入券码', icon: 'none' });
+    return;
+  }
+  if (!merchant.value) {
+    uni.showToast({ title: '当前账号没有可操作的商家', icon: 'none' });
     return;
   }
 
@@ -60,27 +80,27 @@ const executeVerify = async (code: string) => {
   try {
     const res = await verifyCoupon({
       code: code.trim(),
-      operatorMerchantId: merchant.value?._id || 'shop_001'
+      operatorMerchantId: merchant.value._id
     });
 
     uni.hideLoading();
 
     if (res.success) {
+      // 成功核销给予柜台触觉反馈
+      uni.vibrateShort({ type: 'heavy' });
       uni.showModal({
-        title: '✅ 核销成功',
-        content: `已成功核销【${res.coupon?.rule_snapshot?.title}】，优惠金额已生效。`,
+        title: '核销成功',
+        content: USE_MOCK
+          ? `本地演示已核销【${res.coupon?.rule_snapshot?.title}】，不会产生实际抵扣。`
+          : `已核销【${res.coupon?.rule_snapshot?.title}】。`,
         showCancel: false
       });
-      historyList.value.unshift({
-        coupon_title: res.coupon?.rule_snapshot?.title,
-        verify_time: new Date().toLocaleTimeString(),
-        code: code.trim()
-      });
+      await loadHistory();
       inputCode.value = '';
     } else {
       // 严格输出 PRD 8.4 错误码
       uni.showModal({
-        title: '❌ 核销失败',
+        title: '核销失败',
         content: `[错误码 ${res.code}] ${res.message}`,
         showCancel: false
       });
@@ -113,17 +133,19 @@ const handleManualVerify = () => {
 <style scoped>
 .verify-page {
   min-height: 100vh;
-  background-color: #F4F5F7;
+  background-color: var(--zs-canvas);
   padding: 24rpx;
 }
 
 .scan-card {
   background: #ffffff;
-  border-radius: 20rpx;
-  padding: 36rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
-  margin-bottom: 24rpx;
+  border-radius: 19rpx;
+  padding: 26rpx;
+  border: 1rpx solid var(--zs-border);
+  box-shadow: 0 4rpx 16rpx rgba(21,57,38,.035);
+  margin-bottom: 18rpx;
 }
+.demo-notice { color: #896c3b; background: #fff5e5; font-size: 20rpx; line-height: 1.5; }
 
 .scan-header {
   display: flex;
@@ -140,14 +162,14 @@ const handleManualVerify = () => {
 
 .shop-tag {
   font-size: 20rpx;
-  color: #2563EB;
-  background: #EFF6FF;
+  color: var(--zs-green);
+  background: var(--zs-green-soft);
   padding: 4rpx 14rpx;
   border-radius: 6rpx;
 }
 
 .camera-btn {
-  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  background: linear-gradient(135deg, var(--zs-green-dark), var(--zs-green));
   color: #ffffff;
   height: 96rpx;
   line-height: 96rpx;
@@ -162,7 +184,9 @@ const handleManualVerify = () => {
 }
 
 .cam-icon {
-  font-size: 36rpx;
+  width: 35rpx;
+  height: 35rpx;
+  filter: brightness(0) invert(1);
 }
 
 .divider {

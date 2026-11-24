@@ -203,6 +203,10 @@ const goToInfoDetail = (id: string) => {
 const goToPublish = () => {
   uni.navigateTo({ url: '/pages/info/publish' });
 };
+
+const goToMerchantApply = () => {
+  uni.navigateTo({ url: '/pages/merchant/apply' });
+};
 </script>
 
 <style scoped>
@@ -443,5 +447,73 @@ const goToPublish = () => {
 .fab-text {
   font-size: 26rpx;
   font-weight: 600;
+}
+
+.shop-recruiting-card {
+  background: linear-gradient(135deg, var(--zs-green, #17664c), var(--zs-green-dark, #104b39));
+  color: #ffffff;
+  border-radius: 20rpx;
+  padding: 30rpx 26rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14rpx;
+  box-shadow: 0 6rpx 20rpx rgba(23, 102, 76, 0.12);
+}
+
+.recruiting-content {
+  flex: 1;
+  padding-right: 20rpx;
+}
+
+.recruiting-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  color: #d2e8d9;
+  font-size: 18rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 10rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+}
+
+.recruiting-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  line-height: 1.35;
+}
+
+.recruiting-sub {
+  font-size: 20rpx;
+  color: #c8e7d2;
+  margin-top: 6rpx;
+  line-height: 1.4;
+}
+
+.recruiting-btn {
+  flex-shrink: 0;
+  background: var(--zs-orange, #db792e);
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: bold;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+}
+
+.info-empty-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx 0 10rpx;
+}
+
+.empty-publish-action {
+  margin-top: 16rpx;
+  background: var(--zs-green-soft, #eaf4ee);
+  color: var(--zs-green, #17664c);
+  padding: 14rpx 36rpx;
+  border-radius: 30rpx;
+  font-size: 24rpx;
+  font-weight: bold;
 }
 </style>

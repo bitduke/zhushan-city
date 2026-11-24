@@ -23,6 +23,9 @@ importers:
       '@dcloudio/uni-mp-weixin':
         specifier: 3.0.0-alpha-5030720261117001
         version: 3.0.0-alpha-5030720261117001(postcss@8.5.33)(rollup@4.68.8)(vue@3.5.46(typescript@5.9.3))
+      '@tdesign/uniapp':
+        specifier: 1.0.0
+        version: 1.0.0
       pinia:
         specifier: ^2.1.7
         version: 2.3.1(typescript@5.9.3)(vue@3.5.46(typescript@5.9.3))
@@ -1354,6 +1357,9 @@ packages:
 
   '@sinonjs/fake-timers@8.1.0':
     resolution: {integrity: sha512-OAPJUAtgeINhh/TAlUID4QTs53Njm7xzddaVlEs/SXwgtiD1tW22zAB/W1wdqfrpmikgaWQ9Fw6Ws+hsiRm5Vg==}
+
+  '@tdesign/uniapp@1.0.0':
+    resolution: {integrity: sha512-QWJKTs4LUS1TOyIX6LYm8Ot0EGq2NCp1TjUjS7mBslkfh3PYwco76PI3Z6ueUP6YpPV8pVGWIAoKXiz+bF6sjw==}
 
   '@tootallnate/once@1.1.2':
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
@@ -5521,6 +5527,8 @@ snapshots:
   '@sinonjs/fake-timers@8.1.0':
     dependencies:
       '@sinonjs/commons': 1.8.6
+
+  '@tdesign/uniapp@1.0.0': {}
 
   '@tootallnate/once@1.1.2': {}
 

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.cloudbase.net/cli/cloudbaserc.schema.json",
+  "envId": "supporting-vulture-d4cgj6b9b7a15",
+  "functionRoot": "cloudfunctions",
+  "functions": [
+    { "name": "appointmentManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "configManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "cooperationManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "couponClaim", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "couponManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "couponVerify", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "couponVerifyLogs", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "getMyCoupons", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "getPromoterRanking", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "getShopBenefitData", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "infoManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "login", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "merchantCode", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "merchantManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "scanResolve", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "staffManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true },
+    { "name": "statSync", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true, "triggers": [{ "name": "dailyStatSync", "type": "timer", "config": "0 0 2 * * * *" }] },
+    { "name": "userManage", "runtime": "Nodejs20.19", "handler": "index.main", "timeout": 20, "memorySize": 256, "installDependency": true }
+  ]
+}

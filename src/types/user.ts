@@ -1,6 +1,7 @@
 export interface UserProfile {
   _id: string;
-  openid: string;
+  openid?: string;
+  role?: 'RESIDENT' | 'MERCHANT' | 'ADMIN';
   nickname: string;
   avatar: string;
   phone?: string;

@@ -9,11 +9,12 @@ export const TEMPLATE_IDS = {
 
 export function requestAppointmentSubscription(): Promise<boolean> {
   return new Promise((resolve) => {
+    if (TEMPLATE_IDS.APPOINTMENT_CONFIRM.startsWith('TMPL_')) { resolve(false); return; }
     // #ifdef MP-WEIXIN
     if (typeof wx !== 'undefined' && wx.requestSubscribeMessage) {
       wx.requestSubscribeMessage({
         tmplIds: [TEMPLATE_IDS.APPOINTMENT_CONFIRM],
-        success: (res) => {
+        success: (res: Record<string, string>) => {
           if (res[TEMPLATE_IDS.APPOINTMENT_CONFIRM] === 'accept') {
             resolve(true);
           } else {

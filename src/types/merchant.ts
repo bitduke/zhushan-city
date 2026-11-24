@@ -1,7 +1,48 @@
 import type { CouponTemplate } from './coupon';
+import type { CooperationOffer } from './cooperation';
 
 export type MerchantStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
 export type StaffRole = 'OWNER' | 'MANAGER' | 'STAFF';
+
+export interface MerchantApplication {
+  _id: string;
+  merchant_id?: string;
+  applicant_user_id: string;
+  name: string;
+  category_id: string;
+  category_name: string;
+  town: string;
+  address: string;
+  contact_phone: string;
+  business_hours: string;
+  daily_booking_limit?: number;
+  qualification_note: string;
+  qualification_images: string[];
+  qualification_image_urls?: string[]; // 管理员查看私有资质图的临时链接
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  review_reason?: string;
+  reviewed_at?: string;
+  created_at: string;
+}
+
+export interface MerchantStaff {
+  _id?: string;
+  merchant_id: string;
+  user_id: string;
+  role: StaffRole;
+  status: 'ACTIVE' | 'DISABLED';
+  can_verify: boolean;
+  can_handle_appointment: boolean;
+}
+
+export interface StaffInvite {
+  token: string;
+  merchant_id: string;
+  can_verify: boolean;
+  can_handle_appointment: boolean;
+  status: 'ACTIVE' | 'USED' | 'EXPIRED';
+  expires_at: string;
+}
 
 export interface Merchant {
   _id: string;
@@ -18,8 +59,12 @@ export interface Merchant {
   images: string[];
   description: string;
   business_hours: string;
+  daily_booking_limit?: number;
   status: MerchantStatus;
   qrcode_token?: string; // 短 token
+  access_role?: StaffRole;
+  can_verify?: boolean;
+  can_handle_appointment?: boolean;
   created_at: string;
 }
 
@@ -34,18 +79,4 @@ export interface BenefitPlacement {
   end_date: string;
 }
 
-export interface CooperationContract {
-  _id: string;
-  buyer_merchant_id: string;    // 买方 (如 B 美业)
-  promoter_merchant_id: string; // 推广方 (如 A 服装)
-  target_coupon_id: string;
-  pricing_model: 'PER_RESULT' | 'BY_SLOT'; // 按到店新客 或 按周期展位
-  price_per_result: number;     // 如 20 元/新客 (含平台服务费)
-  platform_fee_rate: number;    // 平台费率如 10%
-  total_budget: number;         // 预算上限
-  frozen_deposit: number;       // 预存托管额度 (防赖账)
-  used_budget: number;
-  confirmed_results: number;    // 已核销有效新客数
-  status: 'PENDING' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
-  created_at: string;
-}
+export type CooperationContract = CooperationOffer;

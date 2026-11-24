@@ -1,0 +1,51 @@
+/* 竹山街坊汇视觉变量；TDesign 组件与业务页面共用。 */
+page, .page {
+  --zs-green: #17664c;
+  --zs-green-dark: #104b39;
+  --zs-green-soft: #eaf4ee;
+  --zs-ink: #18342b;
+  --zs-muted: #687b70;
+  --zs-border: #e4eae2;
+  --zs-surface: #ffffff;
+  --zs-canvas: #f6f7f2;
+  --zs-orange: #db792e;
+  --zs-orange-soft: #fff2e5;
+  --zs-terracotta: #e05d26;
+  --zs-terracotta-soft: #fff3ec;
+  --zs-gold: #c08a3e;
+  --zs-gold-soft: #fcf6ea;
+  --zs-shadow-sm: 0 4rpx 14rpx rgba(24, 52, 43, 0.04);
+  --zs-shadow-md: 0 8rpx 24rpx rgba(24, 52, 43, 0.07);
+
+  --td-brand-color-1: #edf6f0;
+  --td-brand-color-2: #d5e9da;
+  --td-brand-color-3: #b4d9bf;
+  --td-brand-color-4: #8bc6a0;
+  --td-brand-color-5: #61ad7d;
+  --td-brand-color-6: #37895f;
+  --td-brand-color-7: #17664c;
+  --td-brand-color-8: #11523e;
+  --td-brand-color-9: #0c3f31;
+  --td-brand-color-10: #082d24;
+  --td-primary-color-1: var(--td-brand-color-1);
+  --td-primary-color-2: var(--td-brand-color-2);
+  --td-primary-color-3: var(--td-brand-color-3);
+  --td-primary-color-4: var(--td-brand-color-4);
+  --td-primary-color-5: var(--td-brand-color-5);
+  --td-primary-color-6: var(--td-brand-color-6);
+  --td-primary-color-7: var(--td-brand-color-7);
+  --td-primary-color-8: var(--td-brand-color-8);
+  --td-primary-color-9: var(--td-brand-color-9);
+  --td-primary-color-10: var(--td-brand-color-10);
+}
+
+.zs-page-hero {
+  margin: -24rpx -24rpx 24rpx;
+  padding: 34rpx 28rpx 42rpx;
+  border-radius: 0 0 30rpx 30rpx;
+  color: #fff;
+  background: linear-gradient(145deg, #17664c, #104b39);
+}
+.zs-page-hero__kicker { display: block; color: #c8e7d2; font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.zs-page-hero__title { margin-top: 7rpx; font-size: 37rpx; line-height: 1.25; font-weight: 800; }
+.zs-page-hero__subtitle { display: block; margin-top: 8rpx; color: #d2e8d9; font-size: 21rpx; line-height: 1.4; }

@@ -21,6 +21,7 @@ export interface CouponTemplate {
   merchant_name: string;
   merchant_avatar?: string;
   merchant_address?: string;
+  merchant_phone?: string;
   title: string;
   type: CouponType;
   usage_mode: CouponUsageMode;
@@ -55,4 +56,5 @@ export interface UserCoupon {
   used_at?: string;
   expires_at: string;
   has_appointment?: boolean;
+  merchant_suspended?: boolean;
 }

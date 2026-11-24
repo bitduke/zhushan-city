@@ -1,179 +1,108 @@
 <template>
   <view class="user-page">
-    <view class="user-card" v-if="profile">
-      <image class="avatar" :src="profile.avatar" mode="aspectFill" />
-      <view class="user-info">
-        <view class="nickname">{{ profile.nickname }}</view>
-        <view class="user-sub">📍 常用区域：{{ profile.town || '竹山县城关镇' }}</view>
+    <view class="profile-hero">
+      <text class="hero-kicker">MY ZHUSHAN</text>
+      <view class="hero-title">我的竹山生活</view>
+      <view class="profile-row" v-if="profile">
+        <image v-if="showAvatar" class="avatar" :src="profile.avatar" mode="aspectFill" @error="avatarFailed = true" />
+        <view v-else class="avatar avatar-fallback">{{ profile.nickname?.slice(0, 1) || '竹' }}</view>
+        <view class="user-info">
+          <view class="nickname">{{ profile.nickname }}</view>
+          <view class="user-sub">常用区域 · {{ profile.town || '城关镇' }}</view>
+        </view>
       </view>
     </view>
 
-    <view class="menu-group">
-      <view class="menu-item" @tap="goToCoupons">
-        <text class="menu-icon">🏷️</text>
-        <text class="menu-label">我的卡券包</text>
-        <text class="menu-arrow">›</text>
+    <view class="content">
+      <view class="group-title">我的内容</view>
+      <view class="menu-group">
+        <view id="my-info-link" class="menu-item" @tap="goToMyInfos">
+          <view class="menu-icon"><image :src="'/static/icons/clipboard.png'" mode="aspectFit" /></view>
+          <text class="menu-label">我的发布</text><text class="menu-arrow">›</text>
+        </view>
       </view>
 
-      <view class="menu-item" @tap="goToPublish">
-        <text class="menu-icon">✍️</text>
-        <text class="menu-label">发布便民信息</text>
-        <text class="menu-arrow">›</text>
+      <view class="group-title">商家服务</view>
+      <view class="menu-group">
+        <view class="menu-item" @tap="goToMerchant">
+          <view class="menu-icon"><image :src="'/static/icons/store.png'" mode="aspectFit" /></view>
+          <text class="menu-label">商家工作台</text><text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" @tap="applyMerchant">
+          <view class="menu-icon"><image :src="'/static/icons/plus.png'" mode="aspectFit" /></view>
+          <text class="menu-label">申请商家入驻</text><text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" @tap="goToJoinMerchant">
+          <view class="menu-icon"><image :src="'/static/icons/user.png'" mode="aspectFit" /></view>
+          <text class="menu-label">使用邀请码加入门店</text><text class="menu-arrow">›</text>
+        </view>
       </view>
+
+      <view class="group-title">平台与帮助</view>
+      <view class="menu-group">
+        <view id="demo-admin-link" class="menu-item" v-if="USE_MOCK || profile?.role === 'ADMIN'" @tap="goToDemoAdmin">
+          <view class="menu-icon"><image :src="'/static/icons/clipboard.png'" mode="aspectFit" /></view>
+          <text class="menu-label">{{ USE_MOCK ? '演示管理台（仅本机）' : '运营管理台' }}</text><text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" @tap="goToPrivacy">
+          <view class="menu-icon"><image :src="'/static/icons/clipboard.png'" mode="aspectFit" /></view>
+          <text class="menu-label">隐私说明</text><text class="menu-arrow">›</text>
+        </view>
+        <view class="menu-item" @tap="goToTerms">
+          <view class="menu-icon"><image :src="'/static/icons/clipboard.png'" mode="aspectFit" /></view>
+          <text class="menu-label">用户服务协议</text><text class="menu-arrow">›</text>
+        </view>
+      <view class="menu-item" @tap="goToHelp">
+          <view class="menu-icon"><image :src="'/static/icons/pin.png'" mode="aspectFit" /></view>
+        <text class="menu-label">帮助与反馈</text><text class="menu-arrow">›</text>
+        </view>
+      </view>
+      <view class="version-text">竹山街坊汇 v1.0 · 本地便民与商家联盟</view>
     </view>
-
-    <view class="menu-group">
-      <view class="menu-item" @tap="goToMerchant">
-        <text class="menu-icon">🏪</text>
-        <text class="menu-label">商家工作台 (核销与看板)</text>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-item" @tap="applyMerchant">
-        <text class="menu-icon">📝</text>
-        <text class="menu-label">商家联盟入驻申请</text>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
-
-    <view class="menu-group">
-      <view class="menu-item" @tap="showPrivacy">
-        <text class="menu-icon">📄</text>
-        <text class="menu-label">用户隐私协议与信息安全</text>
-        <text class="menu-arrow">›</text>
-      </view>
-
-      <view class="menu-item" @tap="callService">
-        <text class="menu-icon">☎️</text>
-        <text class="menu-label">平台客服热线</text>
-        <text class="menu-arrow">›</text>
-      </view>
-    </view>
-
-    <view class="version-text">竹山同城 v1.0 · 本地便民与商家联盟平台</view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useUserStore } from '@/store/user';
+import { USE_MOCK } from '@/api/adapter';
 
 const userStore = useUserStore();
 const profile = computed(() => userStore.profile);
-
-const goToCoupons = () => {
-  uni.switchTab({ url: '/pages/coupon/mine' });
+const avatarFailed = ref(false);
+const showAvatar = computed(() => !!profile.value?.avatar && !profile.value.avatar.includes('picsum.photos') && !avatarFailed.value);
+const goToMyInfos = () => uni.navigateTo({ url: '/pages/info/mine' });
+const goToMerchant = () => uni.navigateTo({ url: '/pages/merchant/index' });
+const applyMerchant = () => uni.navigateTo({ url: '/pages/merchant/apply' });
+const goToJoinMerchant = () => uni.navigateTo({ url: '/pages/merchant/join' });
+const goToDemoAdmin = () => {
+  userStore.enterDemoAdmin();
+  uni.navigateTo({ url: '/pages/admin/index' });
 };
-
-const goToPublish = () => {
-  uni.navigateTo({ url: '/pages/info/publish' });
-};
-
-const goToMerchant = () => {
-  uni.switchTab({ url: '/pages/merchant/index' });
-};
-
-const applyMerchant = () => {
-  uni.showModal({
-    title: '商家入驻申请',
-    content: '欢迎竹山各乡镇优质实体门店加入商圈联盟，请联系平台专员微信登记入驻并免费生成专属福利码。',
-    showCancel: false
-  });
-};
-
-const showPrivacy = () => {
-  uni.showModal({
-    title: '个人信息保护合规说明',
-    content: '竹山同城平台严格遵守《个人信息保护法》，仅在领取优惠券与发布信息时申请必要手机号与授权，不向第三方违规转让客户个人数据。',
-    showCancel: false
-  });
-};
-
-const callService = () => {
-  uni.showToast({ title: '客服工作时间: 09:00-18:00', icon: 'none' });
-};
+const goToPrivacy = () => uni.navigateTo({ url: '/pages/help/privacy' });
+const goToTerms = () => uni.navigateTo({ url: '/pages/help/terms' });
+const goToHelp = () => uni.navigateTo({ url: '/pages/help/contact' });
 </script>
 
 <style scoped>
-.user-page {
-  min-height: 100vh;
-  background-color: #F4F5F7;
-  padding: 24rpx;
-}
-
-.user-card {
-  background: #ffffff;
-  border-radius: 20rpx;
-  padding: 32rpx;
-  display: flex;
-  align-items: center;
-  gap: 24rpx;
-  margin-bottom: 24rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
-}
-
-.avatar {
-  width: 120rpx;
-  height: 120rpx;
-  border-radius: 60rpx;
-  background: #E5E7EB;
-}
-
-.user-info {
-  flex: 1;
-}
-
-.nickname {
-  font-size: 32rpx;
-  font-weight: bold;
-  color: #111827;
-}
-
-.user-sub {
-  font-size: 22rpx;
-  color: #6B7280;
-  margin-top: 8rpx;
-}
-
-.menu-group {
-  background: #ffffff;
-  border-radius: 16rpx;
-  margin-bottom: 24rpx;
-  overflow: hidden;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  padding: 28rpx 24rpx;
-  border-bottom: 1rpx solid #F3F4F6;
-}
-
-.menu-item:last-child {
-  border-bottom: none;
-}
-
-.menu-icon {
-  font-size: 32rpx;
-  margin-right: 18rpx;
-}
-
-.menu-label {
-  flex: 1;
-  font-size: 26rpx;
-  color: #1F2937;
-  font-weight: 500;
-}
-
-.menu-arrow {
-  font-size: 32rpx;
-  color: #9CA3AF;
-}
-
-.version-text {
-  text-align: center;
-  font-size: 20rpx;
-  color: #9CA3AF;
-  margin-top: 40rpx;
-}
+.user-page { min-height: 100vh; padding-bottom: 45rpx; background: var(--zs-canvas); }
+.profile-hero { padding: 34rpx 28rpx 52rpx; border-radius: 0 0 34rpx 34rpx; color: #fff; background: linear-gradient(145deg,#17664c,#104b39); }
+.hero-kicker { color: #c8e7d2; font-size: 18rpx; font-weight: 700; letter-spacing: 2rpx; }
+.hero-title { margin-top: 6rpx; font-size: 38rpx; font-weight: 800; }
+.profile-row { display: flex; align-items: center; gap: 18rpx; margin-top: 28rpx; }
+.avatar { width: 104rpx; height: 104rpx; border-radius: 52rpx; border: 3rpx solid rgba(255,255,255,.55); background: #eaf4ee; }
+.avatar-fallback { display: flex; align-items: center; justify-content: center; color: var(--zs-green); font-size: 43rpx; font-weight: 800; }
+.user-info { flex: 1; min-width: 0; }
+.nickname { color: white; font-size: 30rpx; font-weight: 750; }
+.user-sub { margin-top: 7rpx; color: #d7e9dd; font-size: 21rpx; }
+.content { position: relative; margin: -13rpx 20rpx 0; }
+.group-title { margin: 23rpx 10rpx 13rpx; color: var(--zs-ink); font-size: 26rpx; font-weight: 750; }
+.menu-group { overflow: hidden; border: 1rpx solid var(--zs-border); border-radius: 18rpx; background: white; box-shadow: 0 4rpx 16rpx rgba(19,53,35,.035); }
+.menu-item { display: flex; align-items: center; gap: 16rpx; min-height: 94rpx; padding: 13rpx 21rpx; border-bottom: 1rpx solid #edf0eb; }
+.menu-item:last-child { border-bottom: 0; }
+.menu-icon { width: 52rpx; height: 52rpx; flex-shrink: 0; display: flex; align-items: center; justify-content: center; border-radius: 13rpx; background: var(--zs-green-soft); }
+.menu-icon image { width: 32rpx; height: 32rpx; }
+.menu-label { flex: 1; color: var(--zs-ink); font-size: 24rpx; font-weight: 650; }
+.menu-arrow { color: #9aaba0; font-size: 34rpx; }
+.version-text { margin-top: 34rpx; color: #9aaa9c; font-size: 19rpx; text-align: center; }
 </style>

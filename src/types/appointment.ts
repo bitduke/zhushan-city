@@ -16,6 +16,7 @@ export interface Appointment {
   coupon_title: string;
   contact_name: string;
   contact_phone: string;
+  contact_consent_at?: string;
   requested_time_slot: string; // 用户期望时段
   confirmed_time_slot?: string;// 商家确认时段
   status: AppointmentStatus;

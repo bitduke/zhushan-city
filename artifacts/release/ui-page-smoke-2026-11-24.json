@@ -1,0 +1,388 @@
+{
+  "date": "2026-11-24",
+  "project": "竹山街坊汇",
+  "mode": "WeChat developer tools simulator",
+  "pageCount": 27,
+  "mock": [
+    {
+      "path": "pages/index/index",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/index/index",
+      "error": null
+    },
+    {
+      "path": "pages/search/index",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/search/index",
+      "error": null
+    },
+    {
+      "path": "pages/business/advertise",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/business/advertise",
+      "error": null
+    },
+    {
+      "path": "pages/benefit/shop",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/benefit/shop",
+      "error": null
+    },
+    {
+      "path": "pages/benefit/invalid",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/benefit/invalid",
+      "error": null
+    },
+    {
+      "path": "pages/coupon/mine",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/coupon/mine",
+      "error": null
+    },
+    {
+      "path": "pages/coupon/code",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/coupon/code",
+      "error": null
+    },
+    {
+      "path": "pages/info/list",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/info/list",
+      "error": null
+    },
+    {
+      "path": "pages/info/detail",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/info/detail",
+      "error": null
+    },
+    {
+      "path": "pages/info/publish",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/info/publish",
+      "error": null
+    },
+    {
+      "path": "pages/info/mine",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/info/mine",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/list",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/list",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/index",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/index",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/apply",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/apply",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/detail",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/detail",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/manage",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/manage",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/coupons",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/coupons",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/staff",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/staff",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/join",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/join",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/verify",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/verify",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/appointment",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/appointment",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/ranking",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/ranking",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/cooperation",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/merchant/cooperation",
+      "error": null
+    },
+    {
+      "path": "pages/user/index",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/user/index",
+      "error": null
+    },
+    {
+      "path": "pages/help/privacy",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/help/privacy",
+      "error": null
+    },
+    {
+      "path": "pages/help/contact",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/help/contact",
+      "error": null
+    },
+    {
+      "path": "pages/admin/index",
+      "nav": true,
+      "screenshot": true,
+      "actual": "pages/admin/index",
+      "error": null
+    }
+  ],
+  "cloud": [
+    {
+      "path": "pages/index/index",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/index/index",
+      "error": null
+    },
+    {
+      "path": "pages/search/index",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/search/index",
+      "error": null
+    },
+    {
+      "path": "pages/business/advertise",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/business/advertise",
+      "error": null
+    },
+    {
+      "path": "pages/benefit/shop",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/benefit/shop",
+      "error": null
+    },
+    {
+      "path": "pages/benefit/invalid",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/benefit/invalid",
+      "error": null
+    },
+    {
+      "path": "pages/coupon/mine",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/coupon/mine",
+      "error": null
+    },
+    {
+      "path": "pages/coupon/code",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/coupon/code",
+      "error": null
+    },
+    {
+      "path": "pages/info/list",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/info/list",
+      "error": null
+    },
+    {
+      "path": "pages/info/detail",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/info/detail",
+      "error": null
+    },
+    {
+      "path": "pages/info/publish",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/info/publish",
+      "error": null
+    },
+    {
+      "path": "pages/info/mine",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/info/mine",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/index",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/index",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/apply",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/apply",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/list",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/list",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/detail",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/detail",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/manage",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/manage",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/coupons",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/coupons",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/staff",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/staff",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/join",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/join",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/verify",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/verify",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/appointment",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/appointment",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/ranking",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/ranking",
+      "error": null
+    },
+    {
+      "path": "pages/merchant/cooperation",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/merchant/cooperation",
+      "error": null
+    },
+    {
+      "path": "pages/user/index",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/user/index",
+      "error": null
+    },
+    {
+      "path": "pages/help/privacy",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/help/privacy",
+      "error": null
+    },
+    {
+      "path": "pages/help/contact",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/help/contact",
+      "error": null
+    },
+    {
+      "path": "pages/admin/index",
+      "nav": true,
+      "root": 1,
+      "actual": "pages/admin/index",
+      "error": null
+    }
+  ]
+}

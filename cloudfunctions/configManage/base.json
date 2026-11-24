@@ -1,0 +1,37 @@
+{
+  "towns": [
+    { "id": "420323100", "code": "420323100", "name": "城关镇", "active": true },
+    { "id": "420323101", "code": "420323101", "name": "溢水镇", "active": true },
+    { "id": "420323102", "code": "420323102", "name": "麻家渡镇", "active": true },
+    { "id": "420323103", "code": "420323103", "name": "宝丰镇", "active": true },
+    { "id": "420323104", "code": "420323104", "name": "擂鼓镇", "active": true },
+    { "id": "420323105", "code": "420323105", "name": "秦古镇", "active": true },
+    { "id": "420323106", "code": "420323106", "name": "得胜镇", "active": true },
+    { "id": "420323107", "code": "420323107", "name": "上庸镇", "active": true },
+    { "id": "420323108", "code": "420323108", "name": "官渡镇", "active": true },
+    { "id": "420323200", "code": "420323200", "name": "潘口乡", "active": true },
+    { "id": "420323201", "code": "420323201", "name": "竹坪乡", "active": true },
+    { "id": "420323202", "code": "420323202", "name": "大庙乡", "active": true },
+    { "id": "420323203", "code": "420323203", "name": "双台乡", "active": true },
+    { "id": "420323204", "code": "420323204", "name": "楼台乡", "active": true },
+    { "id": "420323205", "code": "420323205", "name": "文峰乡", "active": true },
+    { "id": "420323206", "code": "420323206", "name": "深河乡", "active": true },
+    { "id": "420323207", "code": "420323207", "name": "柳林乡", "active": true }
+  ],
+  "infoCategories": [
+    { "id": "house", "name": "房屋租售", "icon": "home", "desc": "房东直租/二手房", "active": true },
+    { "id": "idle", "name": "二手闲置", "icon": "cart", "desc": "自用转让/面交", "active": true },
+    { "id": "housekeeping", "name": "家政保洁", "icon": "person", "desc": "保洁/搬家/开荒", "active": true },
+    { "id": "carpool", "name": "拼车互助", "icon": "redo", "desc": "乡镇县城往返", "active": true },
+    { "id": "transfer", "name": "转让/合作", "icon": "handshake", "desc": "门店转让/项目合作", "active": true },
+    { "id": "other", "name": "其他便民", "icon": "help", "desc": "生活求助/失物招领", "active": true }
+  ],
+  "merchantCategories": [
+    { "id": "apparel", "name": "服装女装", "active": true },
+    { "id": "beauty", "name": "美容美甲", "active": true },
+    { "id": "foot_bath", "name": "足道养生", "active": true },
+    { "id": "catering", "name": "特色美食", "active": true },
+    { "id": "car_care", "name": "汽车美容", "active": true },
+    { "id": "parenting", "name": "亲子游乐", "active": true }
+  ]
+}
