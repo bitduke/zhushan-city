@@ -22,7 +22,7 @@ async function sleep(ms) {
 
 async function main() {
   console.log('=====================================================');
-  console.log('🚀 开始对【竹山街坊汇】全系统展开全量深度自动化功能测试');
+  console.log('🚀 开始对【竹山街坊惠】全系统展开全量深度自动化功能测试');
   console.log('=====================================================\n');
 
   // 1. 检查微信开发者工具状态
@@ -120,7 +120,7 @@ async function main() {
   // 生成自动化报告文件
   const passCount = results.filter(r => r.status === 'PASS').length;
   const reportPath = 'D:\\Ai movies\\zhushan-city\\docs\\FULL_SYSTEM_QA_REPORT.md';
-  const reportMd = `# 《竹山街坊汇》全系统微信开发者工具自动化深度测试报告
+  const reportMd = `# 《竹山街坊惠》全系统微信开发者工具自动化深度测试报告
 
 - 测试时间: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}
 - 测试客户端: WeChat IDE CLI (-c codex)

@@ -1,4 +1,4 @@
-# 竹山街坊汇 · 微信小程序
+# 竹山街坊惠 · 微信小程序
 
 竹山本地便民信息与门店互相拓客的小程序。产品范围以 [开发 PRD v1.1](docs/竹山同城_小程序开发PRD_v1.1.md) 为准。
 
@@ -59,7 +59,7 @@ pnpm run test:cloud
 
 ## 界面与组件
 
-界面使用 `@tdesign/uniapp@1.0.0` 的按需组件；竹山街坊汇的配色变量在 `src/styles/brand.css`。居民端、商家工作台和运营页使用同一套竹青与暖白配色。线条图标保存在 `src/static/icons/`，可用 `python scripts/generate-ui-icons.py` 重新生成（需 Pillow）。演示数据里的 `picsum.photos` 图片不会作为真实商家图片展示，页面会使用本地图形占位。
+界面使用 `@tdesign/uniapp@1.0.0` 的按需组件；竹山街坊惠的配色变量在 `src/styles/brand.css`。居民端、商家工作台和运营页使用同一套竹青与暖白配色。线条图标保存在 `src/static/icons/`，可用 `python scripts/generate-ui-icons.py` 重新生成（需 Pillow）。演示数据里的 `picsum.photos` 图片不会作为真实商家图片展示，页面会使用本地图形占位。
 
 首页顶部活动横幅配置在 `src/constants/homeBanners.ts`，图片放在 `src/static/banners/`。当前横幅是平台自有的广告位招商入口，点击进入 `pages/business/advertise`；招商电话与微信号集中在 `src/constants/adContact.ts`。若以后展示付费商家推广，横幅配置项应设置 `isPaid: true`，界面会显示“广告”。
 

@@ -47,7 +47,7 @@ export const COUPON_ADVISOR_PLAYBOOKS: AdvisorPlaybook[] = [
     isAllianceRecommended: true,
     validDays: 60,
     partnerAdvice: '挂在客流大但不同行的盟友门店（如餐馆挂洗车店，女装挂美甲店），用小礼物破冰拉新。',
-    cashierScript: '“老板，扫桌上竹山街坊汇码，不光能减咱家钱，还能顺便领旁边几家好店的免费福利券！”',
+    cashierScript: '“老板，扫桌上竹山街坊惠码，不光能减咱家钱，还能顺便领旁边几家好店的免费福利券！”',
     profitGuard: '设置30元实付门槛防白嫖，赠品选2~4元低成本高感知物，确保第一单即保本。',
     draft: {
       title: '盟友新客满30元赠招牌体验礼',
@@ -118,7 +118,7 @@ export const COUPON_ADVISOR_PLAYBOOKS: AdvisorPlaybook[] = [
     isAllianceRecommended: true,
     validDays: 60,
     partnerAdvice: '优先与【汽车美容】【亲子游乐】结盟！车主洗车等30分钟、家长遛完娃出来正好需要解决吃饭。',
-    cashierScript: '“刚在隔壁洗完车/逛完街吧？咱街坊汇领的券满38直接送凉菜/饮品一份，马上给您端上来！”',
+    cashierScript: '“刚在隔壁洗完车/逛完街吧？咱街坊惠领的券满38直接送凉菜/饮品一份，马上给您端上来！”',
     profitGuard: '饮品/小份凉菜成本仅1.5~3元，但能促使邻店新客专程走过来点主食菜品。',
     draft: {
       title: '盟友专享满38元送特色饮品小菜',
@@ -128,7 +128,7 @@ export const COUPON_ADVISOR_PLAYBOOKS: AdvisorPlaybook[] = [
       discount_amount: '10',
       total_count: '200',
       per_user_limit: '1',
-      instructions: '限首次通过竹山街坊汇联盟渠道领取的新客以后到店堂食使用，实付满38元赠指定饮品或招牌小菜一份，每桌限用1张不外带。'
+      instructions: '限首次通过竹山街坊惠联盟渠道领取的新客以后到店堂食使用，实付满38元赠指定饮品或招牌小菜一份，每桌限用1张不外带。'
     }
   },
   {
@@ -214,7 +214,7 @@ export const COUPON_ADVISOR_PLAYBOOKS: AdvisorPlaybook[] = [
     isAllianceRecommended: true,
     validDays: 60,
     partnerAdvice: '最佳盟友是附近【烧烤/火锅餐馆】和【洗车店】！吃完晚饭解乏或洗完车累了直接进店体验。',
-    cashierScript: '“您扫了街坊汇券过来呀！做主项目免费送一次艾灸/热敷肩颈，先帮您烧水泡脚！”',
+    cashierScript: '“您扫了街坊惠券过来呀！做主项目免费送一次艾灸/热敷肩颈，先帮您烧水泡脚！”',
     profitGuard: '赠送加钟体验项目成本主要是技师闲时时间，零额外物料负担且体验极好。',
     draft: {
       title: '盟友新客足疗满68赠艾灸热敷礼',

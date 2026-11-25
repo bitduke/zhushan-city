@@ -98,12 +98,12 @@ const makeCall = () => {
 };
 
 onShareAppMessage(() => ({
-  title: info.value ? `【${info.value.category_name}】${info.value.title}` : '竹山街坊汇便民信息',
+  title: info.value ? `【${info.value.category_name}】${info.value.title}` : '竹山街坊惠便民信息',
   path: `/pages/info/detail?id=${infoId.value}`
 }));
 
 onShareTimeline(() => ({
-  title: info.value ? `【竹山便民】${info.value.title}` : '竹山街坊汇',
+  title: info.value ? `【竹山便民】${info.value.title}` : '竹山街坊惠',
   query: `id=${infoId.value}`
 }));
 

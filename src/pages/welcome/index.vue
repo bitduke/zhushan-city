@@ -3,7 +3,7 @@
     <view class="hero">
       <view class="mark">竹</view>
       <text class="kicker">WELCOME TO ZHUSHAN</text>
-      <view class="title">欢迎来到竹山街坊汇</view>
+      <view class="title">欢迎来到竹山街坊惠</view>
       <text class="subtitle">找身边的信息与好店，查看门店福利，管理自己的发布和卡券。</text>
     </view>
 

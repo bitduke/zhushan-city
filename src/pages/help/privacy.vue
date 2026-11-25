@@ -3,7 +3,7 @@
     <view class="hero">
       <text class="kicker">PRIVACY</text>
       <view class="hero-title">隐私与信息处理说明</view>
-      <text class="hero-subtitle">了解竹山街坊汇如何使用你提供的信息</text>
+      <text class="hero-subtitle">了解竹山街坊惠如何使用你提供的信息</text>
     </view>
     <view class="body">
       <view class="notice" v-if="!LEGAL_PROFILE.operatorName || !LEGAL_PROFILE.privacyPhone">{{ !LEGAL_PROFILE.operatorName ? '运营主体名称尚未核对，当前页面仅供上线前检查。' : '隐私联系方式尚未配置，当前页面仅供上线前检查。' }}</view>

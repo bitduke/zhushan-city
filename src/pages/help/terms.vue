@@ -3,7 +3,7 @@
     <view class="hero">
       <text class="kicker">TERMS OF SERVICE</text>
       <view class="hero-title">用户服务协议</view>
-      <text class="hero-subtitle">使用竹山街坊汇前，请了解服务范围与使用规则</text>
+      <text class="hero-subtitle">使用竹山街坊惠前，请了解服务范围与使用规则</text>
     </view>
     <view class="body">
       <view class="notice" v-if="!LEGAL_PROFILE.operatorName">运营主体名称尚未核对，当前协议仅供上线前预览。</view>
@@ -14,7 +14,7 @@
       </view>
       <view class="card">
         <view class="section-title">1. 服务内容</view>
-        <text class="paragraph">竹山街坊汇提供本地便民信息浏览与发布、已审核商家展示、门店优惠券领取与出示、服务预约，以及商家申请和管理功能。当前版本不提供小程序内在线支付。</text>
+        <text class="paragraph">竹山街坊惠提供本地便民信息浏览与发布、已审核商家展示、门店优惠券领取与出示、服务预约，以及商家申请和管理功能。当前版本不提供小程序内在线支付。</text>
         <text class="paragraph">部分优惠须在门店扫码后进入该店福利页；合作店优惠仅在双方确认、券仍有效且符合展示条件时出现。</text>
       </view>
       <view class="card">

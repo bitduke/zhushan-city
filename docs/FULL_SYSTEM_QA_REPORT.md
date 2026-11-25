@@ -1,4 +1,4 @@
-# 《竹山街坊汇》全系统微信开发者工具自动化深度测试报告
+# 《竹山街坊惠》全系统微信开发者工具自动化深度测试报告
 
 - 测试时间: 2026/11/24 17:45:57
 - 测试客户端: WeChat IDE CLI (-c codex)
@@ -13,7 +13,7 @@
 | 序号 | 页面路径 | 页面标题 / 挂载状态 | 测试结论 |
 | :--- | :--- | :---: | :---: |
 | 1 | `pages/welcome/index` | 已成功挂载 | **PASS** |
-| 2 | `pages/index/index` | 竹山街坊汇 | **PASS** |
+| 2 | `pages/index/index` | 竹山街坊惠 | **PASS** |
 | 3 | `pages/search/index` | 搜索竹山 | **PASS** |
 | 4 | `pages/business/advertise` | 首页广告位招商 | **PASS** |
 | 5 | `pages/benefit/shop` | 门店专属福利 | **PASS** |

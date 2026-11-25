@@ -4,7 +4,7 @@
       <text class="hero-kicker">ADVERTISE WITH ZHUSHAN</text>
       <view class="hero-title">让竹山人看见</view>
       <view class="hero-title hero-title-second">你的好生意</view>
-      <text class="hero-subtitle">竹山街坊汇首页顶部广告位开放合作</text>
+      <text class="hero-subtitle">竹山街坊惠首页顶部广告位开放合作</text>
     </view>
 
     <view class="content">
@@ -29,7 +29,7 @@
 
       <view class="panel">
         <view class="section-title">怎么合作</view>
-        <view class="step"><text class="step-number">1</text><text>联系竹山街坊汇，说明门店、活动内容和期望展示时间。</text></view>
+        <view class="step"><text class="step-number">1</text><text>联系竹山街坊惠，说明门店、活动内容和期望展示时间。</text></view>
         <view class="step"><text class="step-number">2</text><text>双方确认展示位置、周期、素材、跳转页面及费用。</text></view>
         <view class="step"><text class="step-number">3</text><text>素材审核通过后上线，并核对实际展示内容。</text></view>
         <view class="terms-note">合作价格与效果按具体方案沟通；本页不预设报价或承诺曝光、到店结果。</view>
@@ -45,7 +45,7 @@
           <button class="call-btn" @tap="callContact">拨打电话</button>
           <button class="wechat-btn" @tap="copyWechat">复制微信号</button>
         </view>
-        <text class="contact-hint">添加微信时请备注“竹山街坊汇广告合作”，方便核对需求。</text>
+        <text class="contact-hint">添加微信时请备注“竹山街坊惠广告合作”，方便核对需求。</text>
       </view>
     </view>
   </view>

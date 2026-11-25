@@ -57,7 +57,7 @@
         <text class="menu-label">帮助与反馈</text><text class="menu-arrow">›</text>
         </view>
       </view>
-      <view class="version-text">竹山街坊汇 v1.0 · 本地便民与商家联盟</view>
+      <view class="version-text">竹山街坊惠 v1.0 · 本地便民与商家联盟</view>
     </view>
   </view>
 </template>

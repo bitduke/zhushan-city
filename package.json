@@ -1,7 +1,7 @@
 {
   "name": "zhushan-city",
   "version": "1.0.0",
-  "description": "竹山街坊汇 · 本地便民信息与商家服务小程序",
+  "description": "竹山街坊惠 · 本地便民信息与商家服务小程序",
   "scripts": {
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:mp-weixin": "node scripts/sync-pg-compat.mjs && uni build -p mp-weixin && node scripts/prepare-devtools.mjs",

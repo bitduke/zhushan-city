@@ -248,14 +248,14 @@ onPullDownRefresh(async () => {
 
 // 微信好友/群转发分享
 onShareAppMessage(() => ({
-  title: '竹山街坊汇 - 咱竹山人自己的便民生活与商圈好礼！',
+  title: '竹山街坊惠 - 咱竹山人自己的便民生活与商圈好礼！',
   path: '/pages/index/index',
   imageUrl: bannerImg
 }));
 
 // 朋友圈分享
 onShareTimeline(() => ({
-  title: '竹山街坊汇 - 咱竹山人的便民生活与商圈好礼',
+  title: '竹山街坊惠 - 咱竹山人的便民生活与商圈好礼',
   query: ''
 }));
 </script>

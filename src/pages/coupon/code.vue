@@ -79,7 +79,7 @@ import type { Appointment } from '@/types/appointment';
 onShareAppMessage(() => {
   const title = coupon.value
     ? `送你一张【${coupon.value.merchant_name}】${coupon.value.rule_snapshot?.title || '专属优惠'}`
-    : '竹山街坊汇精选门店卡券';
+    : '竹山街坊惠精选门店卡券';
   return {
     title,
     path: `/pages/benefit/shop?shopId=${coupon.value?.merchant_id || ''}`
