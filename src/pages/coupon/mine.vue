@@ -18,6 +18,7 @@
           <view class="empty-icon"><image :src="'/static/icons/ticket.png'" mode="aspectFit" /></view>
           <view class="empty-title">暂无相关卡券</view>
           <text class="empty-text">到参与门店扫描福利码并领取后，卡券会保存在这里。</text>
+          <view class="empty-action-btn" @tap="goToAlliance">了解商圈好券与玩法 ›</view>
         </view>
         <CouponCard
           v-for="item in displayList"
@@ -33,7 +34,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { onShow } from '@dcloudio/uni-app';
+import { onShow, onPullDownRefresh, onShareAppMessage } from '@dcloudio/uni-app';
 import { getMyCoupons } from '@/api/coupon';
 import CouponCard from '@/components/CouponCard.vue';
 
@@ -53,6 +54,17 @@ const displayList = computed(() => {
   return expiredList.value;
 });
 const onCouponAction = (coupon: any) => uni.navigateTo({ url: '/pages/coupon/code?code=' + encodeURIComponent(coupon.code) });
+const goToAlliance = () => uni.navigateTo({ url: '/pages/benefit/alliance' });
+
+onPullDownRefresh(async () => {
+  await loadCoupons();
+  uni.stopPullDownRefresh();
+});
+
+onShareAppMessage(() => ({
+  title: '竹山商圈联盟福利卡券，到店出示享专属好礼！',
+  path: '/pages/benefit/alliance'
+}));
 </script>
 
 <style scoped>
@@ -72,5 +84,6 @@ const onCouponAction = (coupon: any) => uni.navigateTo({ url: '/pages/coupon/cod
 .empty-icon { width: 110rpx; height: 110rpx; display: flex; align-items: center; justify-content: center; border-radius: 28rpx; background: var(--zs-green-soft); }
 .empty-icon image { width: 63rpx; height: 63rpx; }
 .empty-title { margin-top: 23rpx; color: var(--zs-ink); font-size: 28rpx; font-weight: 750; }
-.empty-text { margin-top: 9rpx; color: var(--zs-muted); font-size: 22rpx; }
+.empty-text { margin-top: 9rpx; color: var(--zs-muted); font-size: 22rpx; text-align: center; }
+.empty-action-btn { margin-top: 26rpx; padding: 12rpx 32rpx; border: 1.5rpx solid var(--zs-green); border-radius: 30rpx; color: var(--zs-green); font-size: 23rpx; font-weight: 700; background: var(--zs-green-soft); }
 </style>

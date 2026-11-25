@@ -26,6 +26,7 @@
           :key="idx" 
           :src="img" 
           mode="widthFix" 
+          @tap="previewImage(img)"
         />
       </view>
     </view>
@@ -55,7 +56,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { onLoad, onShow } from '@dcloudio/uni-app';
+import { onLoad, onShow, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
 import { USE_MOCK } from '@/api/adapter';
 import { getInfoDetail, reportInfo } from '@/api/info';
 import type { InfoItem } from '@/types/info';
@@ -69,15 +70,42 @@ const formatTime = (value: string) => {
 };
 const visibleImages = computed(() => (info.value?.images || []).filter(src => !src.includes('picsum.photos')));
 
+const previewImage = (current: string) => {
+  uni.previewImage({
+    current,
+    urls: visibleImages.value
+  });
+};
+
 const load = async () => { if (infoId.value) info.value = await getInfoDetail(infoId.value); };
 onLoad((options) => { infoId.value = options?.id || ''; load(); });
 onShow(load);
 
 const makeCall = () => {
   if (info.value?.contact_consent && info.value.contact_phone) {
-    uni.makePhoneCall({ phoneNumber: info.value.contact_phone });
+    uni.showModal({
+      title: '联系发布方',
+      content: `是否呼叫 ${info.value.contact_phone}（${info.value.author_name}）？`,
+      confirmText: '呼叫',
+      confirmColor: '#17664c',
+      success: (res) => {
+        if (res.confirm) {
+          uni.makePhoneCall({ phoneNumber: info.value!.contact_phone });
+        }
+      }
+    });
   }
 };
+
+onShareAppMessage(() => ({
+  title: info.value ? `【${info.value.category_name}】${info.value.title}` : '竹山街坊汇便民信息',
+  path: `/pages/info/detail?id=${infoId.value}`
+}));
+
+onShareTimeline(() => ({
+  title: info.value ? `【竹山便民】${info.value.title}` : '竹山街坊汇',
+  query: `id=${infoId.value}`
+}));
 
 const handleReport = () => {
   uni.showActionSheet({

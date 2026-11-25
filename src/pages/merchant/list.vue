@@ -28,7 +28,14 @@
         <text>为你找到 {{ total }} 家好店</text>
         <text>已审核商家</text>
       </view>
-      <t-empty v-if="!loading && items.length === 0" description="当前筛选暂无已审核商家" />
+      <view v-if="!loading && items.length === 0" class="empty-merchant-card">
+        <view class="empty-merchant-icon">🏪</view>
+        <text class="empty-merchant-title">本区域暂无已入驻商家</text>
+        <text class="empty-merchant-desc">竹山商圈联盟诚邀本地实体商户入驻，进店即可扫码发券，同城商家相互引流拓客！</text>
+        <view class="apply-merchant-btn" @tap="goToApply">
+          <text>✨ 申请入驻商圈联盟</text>
+        </view>
+      </view>
       <view class="shop-list">
         <ShopCard v-for="item in items" :key="item._id" :shop="item" @click="goDetail(item._id)" />
       </view>
@@ -39,7 +46,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { onShow, onReachBottom } from '@dcloudio/uni-app';
+import { onShow, onReachBottom, onPullDownRefresh, onShareAppMessage } from '@dcloudio/uni-app';
 import { getPublicMerchants } from '@/api/merchant';
 import { useUserStore } from '@/store/user';
 import { useConfigStore } from '@/store/config';
@@ -99,6 +106,17 @@ const onCategoryChange = (event: any) => { categoryIndex.value = Number(event.de
 const onTownChange = (event: any) => { townIndex.value = Number(event.detail.value); load(true); };
 const search = () => load(true);
 const goDetail = (id: string) => uni.navigateTo({ url: '/pages/merchant/detail?id=' + encodeURIComponent(id) });
+const goToApply = () => uni.navigateTo({ url: '/pages/merchant/apply' });
+
+onPullDownRefresh(async () => {
+  await load(true);
+  uni.stopPullDownRefresh();
+});
+
+onShareAppMessage(() => ({
+  title: '逛竹山好店，享同城商圈专属礼遇！',
+  path: '/pages/merchant/list'
+}));
 </script>
 
 <style scoped>
@@ -122,4 +140,50 @@ const goDetail = (id: string) => uni.navigateTo({ url: '/pages/merchant/detail?i
 .list-heading text:first-child { color: var(--zs-ink); font-size: 27rpx; font-weight: 750; }
 .list-heading text:last-child { color: var(--zs-muted); font-size: 19rpx; }
 .shop-list { display: flex; flex-direction: column; gap: 15rpx; margin-bottom: 25rpx; }
+
+/* 雅致空状态与招商卡片 */
+.empty-merchant-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 30rpx;
+  background: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 6rpx 20rpx rgba(23, 102, 76, 0.05);
+  margin-top: 10rpx;
+}
+.empty-merchant-icon {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
+  background: var(--zs-green-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  margin-bottom: 20rpx;
+}
+.empty-merchant-title {
+  font-size: 30rpx;
+  font-weight: 800;
+  color: var(--zs-ink);
+  margin-bottom: 12rpx;
+}
+.empty-merchant-desc {
+  font-size: 23rpx;
+  color: var(--zs-muted);
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 32rpx;
+  padding: 0 20rpx;
+}
+.apply-merchant-btn {
+  background: linear-gradient(135deg, var(--zs-green), #238b69);
+  color: #ffffff;
+  padding: 16rpx 40rpx;
+  border-radius: 40rpx;
+  font-size: 25rpx;
+  font-weight: 700;
+  box-shadow: 0 6rpx 18rpx rgba(23, 102, 76, 0.25);
+}
 </style>

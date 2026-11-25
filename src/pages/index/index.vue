@@ -152,6 +152,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { onPullDownRefresh, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
 import { ZHUSHAN_TOWNS } from '@/constants/regions';
 import { getHomeData } from '@/api/home';
 import { useUserStore } from '@/store/user';
@@ -238,6 +239,25 @@ const goToInfoList = () => {
 const goToInfoDetail = (id: string) => {
   uni.navigateTo({ url: `/pages/info/detail?id=${id}` });
 };
+
+// 下拉刷新支持
+onPullDownRefresh(async () => {
+  await loadData();
+  uni.stopPullDownRefresh();
+});
+
+// 微信好友/群转发分享
+onShareAppMessage(() => ({
+  title: '竹山街坊汇 - 咱竹山人自己的便民生活与商圈好礼！',
+  path: '/pages/index/index',
+  imageUrl: bannerImg
+}));
+
+// 朋友圈分享
+onShareTimeline(() => ({
+  title: '竹山街坊汇 - 咱竹山人的便民生活与商圈好礼',
+  query: ''
+}));
 </script>
 
 <style scoped>
