@@ -80,7 +80,7 @@
       </view>
       <view class="menu-card" v-if="canManage" @tap="goToCoupons">
         <view class="menu-icon"><image :src="'/static/icons/ticket.png'" mode="aspectFit" /></view>
-        <view class="menu-text"><text class="menu-title">优惠券管理</text><text class="menu-desc">建券、上架和暂停新领券</text></view>
+        <view class="menu-text"><text class="menu-title">优惠券 & 拓客参谋</text><text class="menu-desc">行业模板一键套用、建券上架</text></view>
       </view>
       <view class="menu-card primary-action" v-if="canVerify" @tap="goToVerify">
         <view class="menu-icon"><image :src="'/static/icons/search.png'" mode="aspectFit" /></view>
