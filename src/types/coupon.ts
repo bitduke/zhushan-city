@@ -46,6 +46,8 @@ export interface UserCoupon {
   coupon_id: string;
   merchant_id: string;
   merchant_name: string;
+  category_id?: string;
+  category_name?: string;
   merchant_address?: string;
   merchant_phone?: string;
   source_merchant_id?: string; // 来源引流店ID (如 A 服装店)
@@ -57,4 +59,14 @@ export interface UserCoupon {
   expires_at: string;
   has_appointment?: boolean;
   merchant_suspended?: boolean;
+}
+
+export interface UserCouponSummary {
+  unusedCount: number;
+  usedCount: number;
+  expiredCount: number;
+  totalSavedYuan: number;
+  expiringSoonList: UserCoupon[];
+  nearestExpiring: UserCoupon | null;
+  categoryCounts: Record<string, number>;
 }

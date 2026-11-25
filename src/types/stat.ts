@@ -22,3 +22,42 @@ export interface MerchantRankingItem {
   sample_size: number;          // 样本量
   is_new_partner?: boolean;
 }
+
+export interface DiagnosticSuggestion {
+  kind: 'IMPROVE_HOOK' | 'IMPROVE_VERIFY' | 'EXPAND_ALLIANCE' | 'KEEP_GROWING';
+  title: string;
+  detail: string;
+  actionLabel: string;
+  targetPage: string;
+}
+
+export interface MerchantDiagnostics {
+  merchantId: string;
+  merchantName: string;
+  categoryId: string;
+  categoryName: string;
+  periodDays: number;
+  pendingAppointmentsCount: number;
+  hasEnoughOwnAcquireSample: boolean;
+  hasEnoughOwnVerifySample: boolean;
+  metrics: {
+    scans: number;
+    selfClaims: number;
+    totalClaims: number;
+    selfRedeems: number;
+    broughtGuests: number;
+    receivedGuests: number;
+    acquireRate: number;
+    verifyRate: number;
+  };
+  peer: {
+    categoryName: string;
+    peerCount: number;
+    hasEnoughPeerSample: boolean;
+    peerAvgAcquireRate: number;
+    peerAvgVerifyRate: number;
+    beatAcquirePercent: number | null;
+    beatVerifyPercent: number | null;
+  };
+  suggestions: DiagnosticSuggestion[];
+}

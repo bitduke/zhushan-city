@@ -50,6 +50,102 @@
       </view>
     </view>
 
+    <!-- 3.5 动态千人千面角色驾驶舱 -->
+    <!-- A. 管理员工作巡检条 -->
+    <view class="cockpit-card admin-cockpit" v-if="isAdmin" @tap="goToAdmin">
+      <view class="cockpit-row">
+        <view class="cockpit-left">
+          <text class="cockpit-badge admin">运营巡检</text>
+          <text class="cockpit-title">前往审核入驻商家、便民动态与跨店合作</text>
+        </view>
+        <text class="cockpit-arrow">进入管理台 ›</text>
+      </view>
+    </view>
+
+    <!-- B. 商家店主 / 店员经营诊断驾驶舱 -->
+    <view class="cockpit-card merchant-cockpit" v-if="activeMerchant">
+      <view class="mc-top" @tap="goToMerchantDesk">
+        <view class="mc-name-wrap">
+          <text class="cockpit-badge shop">商家驾驶舱</text>
+          <text class="mc-shop-name">{{ activeMerchant.name }}</text>
+        </view>
+        <text class="mc-link">完整诊断 ›</text>
+      </view>
+
+      <view class="mc-metrics" v-if="merchantDiagnostics">
+        <view class="mc-metric">
+          <text class="mc-val">{{ merchantDiagnostics.metrics.scans }}</text>
+          <text class="mc-lbl">扫码人数</text>
+        </view>
+        <view class="mc-metric">
+          <text class="mc-val green">{{ merchantDiagnostics.metrics.acquireRate }}%</text>
+          <text class="mc-lbl">扫码获客率</text>
+        </view>
+        <view class="mc-metric">
+          <text class="mc-val orange">{{ merchantDiagnostics.metrics.verifyRate }}%</text>
+          <text class="mc-lbl">核销转化率</text>
+        </view>
+      </view>
+
+      <view class="mc-tip" v-if="merchantDiagnostics && merchantDiagnostics.suggestions.length > 0" @tap="goSuggestion(merchantDiagnostics.suggestions[0].targetPage)">
+        <text class="mc-tip-txt">💡 {{ merchantDiagnostics.suggestions[0].title }}</text>
+        <text class="mc-tip-go">{{ merchantDiagnostics.suggestions[0].actionLabel }} ›</text>
+      </view>
+
+      <view class="mc-actions">
+        <view class="mc-act-btn primary" @tap="goToVerify">📷 扫码核销</view>
+        <view class="mc-act-btn" @tap="goToCoupons">✨ 参谋建券</view>
+        <view class="mc-act-btn" @tap="goToAppointment" v-if="merchantDiagnostics && merchantDiagnostics.pendingAppointmentsCount > 0">
+          ⏰ 预约({{ merchantDiagnostics.pendingAppointmentsCount }})
+        </view>
+        <view class="mc-act-btn" @tap="goToCooperation" v-else>🤝 跨店合作</view>
+      </view>
+    </view>
+
+    <!-- C. 普通居民省钱小账本 & 到期倒计时（有领券或已省过钱时才显示，绝不显示刺眼 0） -->
+    <view class="cockpit-card resident-cockpit" v-if="showResidentSavings">
+      <view class="rc-top" @tap="goToWallet">
+        <view class="rc-saved">
+          <text class="rc-label">💰 街坊惠已为您省钱</text>
+          <view class="rc-amount">
+            <text class="rc-yen">¥</text>
+            <text class="rc-num">{{ couponSummary.totalSavedYuan }}</text>
+            <text class="rc-sub">（已核销 {{ couponSummary.usedCount }} 笔）</text>
+          </view>
+        </view>
+        <view class="rc-wallet-pill">
+          <text class="rc-unused-num">{{ couponSummary.unusedCount }}</text>
+          <text class="rc-unused-txt">张待用 ›</text>
+        </view>
+      </view>
+
+      <view class="rc-countdown-bar" v-if="couponSummary.nearestExpiring" @tap="goToCouponCode(couponSummary.nearestExpiring.code)">
+        <text class="rc-cd-txt">⏳「{{ couponSummary.nearestExpiring.rule_snapshot.title }}」仅剩 {{ formatCountdown(couponSummary.nearestExpiring.expires_at, nowTick) }}</text>
+        <text class="rc-cd-go">去亮码 ›</text>
+      </view>
+    </view>
+
+    <!-- 3.8 按行业找竹山好店优惠（精简横向胶囊条，不显臃肿） -->
+    <view class="industry-bar-section">
+      <view class="ind-head">
+        <text class="ind-title">🏷️ 优惠按行业找好店</text>
+        <text class="ind-count" @tap="goToShops('all')">{{ featuredShopCount > 0 ? `共 ${featuredShopCount} 家入驻好店 ›` : '浏览商家目录 ›' }}</text>
+      </view>
+      <scroll-view class="ind-scroll" scroll-x show-scrollbar="false">
+        <view class="ind-row">
+          <view
+            v-for="ind in industryShortcuts"
+            :key="ind.id"
+            class="ind-pill"
+            @tap="goToShops(ind.id)"
+          >
+            <text class="ind-emoji">{{ ind.emoji }}</text>
+            <text class="ind-name">{{ ind.name }}</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
     <!-- 4. 便民分类金刚区卡片【你想找什么】 -->
     <view class="card-wrap category-card">
       <view class="card-head">
@@ -151,11 +247,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { onPullDownRefresh, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
+import { ref, computed } from 'vue';
+import { onShow, onHide, onUnload, onPullDownRefresh, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
 import { ZHUSHAN_TOWNS } from '@/constants/regions';
 import { getHomeData } from '@/api/home';
+import { getMyCoupons, summarizeMyCoupons, formatCountdown } from '@/api/coupon';
+import { getMyMerchants } from '@/api/merchant';
+import { getMerchantDiagnostics } from '@/api/ranking';
+import { USE_MOCK } from '@/api/adapter';
+import { hasServiceConsent } from '@/utils/consent';
 import { useUserStore } from '@/store/user';
+import { useMerchantStore } from '@/store/merchant';
+import type { UserCoupon } from '@/types/coupon';
+import type { Merchant } from '@/types/merchant';
+import type { MerchantDiagnostics } from '@/types/stat';
 import InfoCard from '@/components/InfoCard.vue';
 
 // 静态图片路径常量（避免 vite vue 插件将其转为缺失的 common/assets.js）
@@ -165,6 +270,7 @@ const ticketIcon = '/static/icons/tab-ticket.png';
 const plusIcon = '/static/icons/plus.png';
 
 const userStore = useUserStore();
+const merchantStore = useMerchantStore();
 const currentTown = computed(() => userStore.selectedTown);
 const townNames = ['全竹山', ...ZHUSHAN_TOWNS.map(t => t.name)];
 const selectedTownIndex = computed(() => {
@@ -174,6 +280,26 @@ const selectedTownIndex = computed(() => {
 
 const searchKeyword = ref('');
 const infoList = ref<any[]>([]);
+const featuredShopCount = ref(0);
+const myCoupons = ref<UserCoupon[]>([]);
+const activeMerchant = ref<Merchant | null>(null);
+const merchantDiagnostics = ref<MerchantDiagnostics | null>(null);
+const nowTick = ref(Date.now());
+let tickTimer: ReturnType<typeof setInterval> | null = null;
+
+const isAdmin = computed(() => userStore.profile?.role === 'ADMIN' || userStore.isDemoAdmin);
+const couponSummary = computed(() => summarizeMyCoupons(myCoupons.value, nowTick.value));
+const showResidentSavings = computed(() => couponSummary.value.unusedCount > 0 || couponSummary.value.usedCount > 0);
+
+// 行业优惠快筛
+const industryShortcuts = [
+  { id: 'catering', name: '特色美食', emoji: '🍜' },
+  { id: 'beauty', name: '美容美甲', emoji: '💅' },
+  { id: 'foot_bath', name: '足道养生', emoji: '💆' },
+  { id: 'apparel', name: '服装女装', emoji: '👗' },
+  { id: 'car_care', name: '汽车美容', emoji: '🚗' },
+  { id: 'parenting', name: '亲子游乐', emoji: '👶' }
+];
 
 // 分类与专属图标配置（与原图 100% 精确匹配）
 const categories = [
@@ -185,20 +311,63 @@ const categories = [
   { id: 'other', name: '其他便民', iconPath: '', bg: '#F3E8FF', shortText: '自', textColor: '#7E22CE' }
 ];
 
-onMounted(async () => {
-  userStore.initUser();
-  await loadData();
-});
+const loadRoleCockpit = async () => {
+  if (!hasServiceConsent()) return;
+  try {
+    const couponsTask = getMyCoupons().catch(() => [] as UserCoupon[]);
+    const merchantsTask = getMyMerchants().catch(() => [] as Merchant[]);
+    const [couponsRes, merchantsRes] = await Promise.all([couponsTask, merchantsTask]);
+    myCoupons.value = couponsRes;
+
+    const approvedMerchant = merchantsRes.find(m => m.status === 'APPROVED') || null;
+    activeMerchant.value = approvedMerchant;
+    if (approvedMerchant && !merchantStore.currentMerchant) {
+      merchantStore.setCurrentMerchant(approvedMerchant);
+    }
+    if (approvedMerchant) {
+      merchantDiagnostics.value = await getMerchantDiagnostics(approvedMerchant._id).catch(() => null);
+    } else {
+      merchantDiagnostics.value = null;
+    }
+  } catch (err) {
+    console.warn('Role cockpit load warning:', err);
+  }
+};
 
 const loadData = async () => {
   try {
     const townParam = currentTown.value === '全竹山' ? '' : currentTown.value;
     const data = await getHomeData({ town: townParam });
     infoList.value = data.recent_infos || [];
+    featuredShopCount.value = (data.featured_shops || []).length;
   } catch (err) {
     console.error('Failed to load home data:', err);
   }
 };
+
+const startTicker = () => {
+  if (tickTimer) clearInterval(tickTimer);
+  tickTimer = setInterval(() => {
+    nowTick.value = Date.now();
+  }, 1000);
+};
+
+const stopTicker = () => {
+  if (tickTimer) {
+    clearInterval(tickTimer);
+    tickTimer = null;
+  }
+};
+
+onShow(async () => {
+  await userStore.initUser();
+  nowTick.value = Date.now();
+  await Promise.all([loadData(), loadRoleCockpit()]);
+  startTicker();
+});
+
+onHide(stopTicker);
+onUnload(stopTicker);
 
 const onTownChange = (e: any) => {
   const idx = Number(e.detail.value);
@@ -216,33 +385,34 @@ const onSearch = () => {
   uni.navigateTo({ url: `/pages/search/index?keyword=${encodeURIComponent(kw)}` });
 };
 
-const onBannerClick = () => {
-  uni.navigateTo({ url: '/pages/business/advertise' });
+const onBannerClick = () => uni.navigateTo({ url: '/pages/business/advertise' });
+const onCategoryClick = (catId: string) => uni.navigateTo({ url: `/pages/info/list?catId=${catId}` });
+const goToAlliance = () => uni.navigateTo({ url: '/pages/benefit/alliance' });
+const goToPublish = () => uni.navigateTo({ url: '/pages/info/publish' });
+const goToInfoList = () => uni.navigateTo({ url: '/pages/info/list' });
+const goToInfoDetail = (id: string) => uni.navigateTo({ url: `/pages/info/detail?id=${id}` });
+const goToWallet = () => uni.switchTab({ url: '/pages/coupon/mine' });
+const goToCouponCode = (code: string) => uni.navigateTo({ url: `/pages/coupon/code?code=${encodeURIComponent(code)}` });
+const goToMerchantDesk = () => uni.navigateTo({ url: '/pages/merchant/index' });
+const goToVerify = () => uni.navigateTo({ url: '/pages/merchant/verify' });
+const goToCoupons = () => uni.navigateTo({ url: '/pages/merchant/coupons' });
+const goToAppointment = () => uni.navigateTo({ url: '/pages/merchant/appointment' });
+const goToCooperation = () => uni.navigateTo({ url: '/pages/merchant/cooperation' });
+const goSuggestion = (url: string) => { if (url) uni.navigateTo({ url }); };
+const goToAdmin = () => {
+  if (USE_MOCK) userStore.enterDemoAdmin();
+  uni.navigateTo({ url: '/pages/admin/index' });
 };
-
-const onCategoryClick = (catId: string) => {
-  uni.navigateTo({ url: `/pages/info/list?catId=${catId}` });
-};
-
-const goToAlliance = () => {
-  uni.navigateTo({ url: '/pages/benefit/alliance' });
-};
-
-const goToPublish = () => {
-  uni.navigateTo({ url: '/pages/info/publish' });
-};
-
-const goToInfoList = () => {
-  uni.navigateTo({ url: '/pages/info/list' });
-};
-
-const goToInfoDetail = (id: string) => {
-  uni.navigateTo({ url: `/pages/info/detail?id=${id}` });
+const goToShops = (catId: string) => {
+  if (catId && catId !== 'all') {
+    uni.setStorageSync('zhushan_merchant_filter_cat', catId);
+  }
+  uni.switchTab({ url: '/pages/merchant/list' });
 };
 
 // 下拉刷新支持
 onPullDownRefresh(async () => {
-  await loadData();
+  await Promise.all([loadData(), loadRoleCockpit()]);
   uni.stopPullDownRefresh();
 });
 
@@ -395,7 +565,7 @@ onShareTimeline(() => ({
 
 /* 3. 搜索栏 */
 .search-section {
-  margin-bottom: 24rpx;
+  margin-bottom: 20rpx;
 }
 
 .search-box {
@@ -432,6 +602,283 @@ onShareTimeline(() => ({
   color: #17664C;
   padding-left: 14rpx;
   border-left: 1rpx solid #E5E7EB;
+}
+
+/* 3.5 动态千人千面角色驾驶舱 */
+.cockpit-card {
+  background: #FFFFFF;
+  border-radius: 22rpx;
+  padding: 20rpx 22rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 6rpx 18rpx rgba(15, 23, 42, 0.05);
+}
+
+.cockpit-badge {
+  font-size: 18rpx;
+  font-weight: 700;
+  padding: 4rpx 12rpx;
+  border-radius: 10rpx;
+  color: #fff;
+}
+.cockpit-badge.admin { background: #b45309; }
+.cockpit-badge.shop { background: #17664c; }
+
+.admin-cockpit {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border: 1rpx solid #fde68a;
+}
+.cockpit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12rpx;
+}
+.cockpit-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex: 1;
+  min-width: 0;
+}
+.cockpit-title {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #78350f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cockpit-arrow {
+  font-size: 21rpx;
+  font-weight: 700;
+  color: #b45309;
+  white-space: nowrap;
+}
+
+/* 商家驾驶舱 */
+.merchant-cockpit {
+  border-top: 6rpx solid #17664c;
+  background: linear-gradient(180deg, #f3faf6 0%, #ffffff 42%);
+}
+.mc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14rpx;
+}
+.mc-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex: 1;
+  min-width: 0;
+}
+.mc-shop-name {
+  font-size: 25rpx;
+  font-weight: 800;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mc-link {
+  font-size: 21rpx;
+  font-weight: 700;
+  color: #17664c;
+  white-space: nowrap;
+}
+.mc-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12rpx;
+  margin-bottom: 14rpx;
+}
+.mc-metric {
+  background: #f8faf8;
+  border-radius: 14rpx;
+  padding: 12rpx 8rpx;
+  text-align: center;
+}
+.mc-val {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 900;
+  color: #111827;
+}
+.mc-val.green { color: #17664c; }
+.mc-val.orange { color: #e05d26; }
+.mc-lbl {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 18rpx;
+  color: #6b7280;
+}
+.mc-tip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff7ed;
+  border: 1rpx solid #fed7aa;
+  border-radius: 12rpx;
+  padding: 10rpx 14rpx;
+  margin-bottom: 14rpx;
+}
+.mc-tip-txt {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #9a3412;
+}
+.mc-tip-go {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #e05d26;
+}
+.mc-actions {
+  display: flex;
+  gap: 12rpx;
+}
+.mc-act-btn {
+  flex: 1;
+  height: 58rpx;
+  line-height: 58rpx;
+  text-align: center;
+  border-radius: 14rpx;
+  background: #eef6f1;
+  color: #17664c;
+  font-size: 21rpx;
+  font-weight: 700;
+}
+.mc-act-btn.primary {
+  background: #17664c;
+  color: #fff;
+}
+
+/* 居民省钱账本驾驶舱 */
+.resident-cockpit {
+  background: linear-gradient(135deg, #fffaf0 0%, #ffffff 100%);
+  border: 1.5rpx solid #fde6c4;
+}
+.rc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rc-label {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #92400e;
+}
+.rc-amount {
+  display: flex;
+  align-items: baseline;
+  margin-top: 4rpx;
+}
+.rc-yen {
+  font-size: 24rpx;
+  font-weight: 800;
+  color: #e05d26;
+}
+.rc-num {
+  font-size: 40rpx;
+  font-weight: 900;
+  color: #e05d26;
+  margin: 0 6rpx 0 2rpx;
+  line-height: 1;
+}
+.rc-sub {
+  font-size: 19rpx;
+  color: #78716c;
+}
+.rc-wallet-pill {
+  background: #17664c;
+  color: #fff;
+  padding: 10rpx 20rpx;
+  border-radius: 26rpx;
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+.rc-unused-num {
+  font-size: 26rpx;
+  font-weight: 900;
+}
+.rc-unused-txt {
+  font-size: 20rpx;
+}
+.rc-countdown-bar {
+  margin-top: 14rpx;
+  padding: 10rpx 16rpx;
+  border-radius: 12rpx;
+  background: #fff1eb;
+  border: 1rpx solid #fcd5c4;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10rpx;
+}
+.rc-cd-txt {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: #c74714;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rc-cd-go {
+  font-size: 20rpx;
+  font-weight: 800;
+  color: #e05d26;
+  white-space: nowrap;
+}
+
+/* 3.8 行业找好店横向胶囊条 */
+.industry-bar-section {
+  margin-bottom: 20rpx;
+}
+.ind-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+  padding: 0 4rpx;
+}
+.ind-title {
+  font-size: 23rpx;
+  font-weight: 800;
+  color: #1f2937;
+}
+.ind-count {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: #17664c;
+}
+.ind-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+.ind-row {
+  display: inline-flex;
+  gap: 12rpx;
+  padding-bottom: 4rpx;
+}
+.ind-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 10rpx 18rpx;
+  background: #ffffff;
+  border: 1rpx solid #e5ebe7;
+  border-radius: 28rpx;
+  box-shadow: 0 2rpx 8rpx rgba(15, 23, 42, 0.03);
+}
+.ind-emoji {
+  font-size: 24rpx;
+}
+.ind-name {
+  font-size: 21rpx;
+  font-weight: 600;
+  color: #374151;
 }
 
 /* 卡片统一白色圆角容器 */

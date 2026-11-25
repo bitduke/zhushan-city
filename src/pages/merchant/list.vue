@@ -99,6 +99,12 @@ onShow(async () => {
     townIndex.value = Math.max(0, towns.value.findIndex(item => item.name === useUserStore().selectedTown));
     initialized = true;
   }
+  const pendingCat = uni.getStorageSync('zhushan_merchant_filter_cat');
+  if (pendingCat) {
+    uni.removeStorageSync('zhushan_merchant_filter_cat');
+    const idx = categories.value.findIndex(item => item.id === pendingCat);
+    if (idx >= 0) categoryIndex.value = idx;
+  }
   load(true);
 });
 onReachBottom(() => { if (hasMore.value) load(false); });

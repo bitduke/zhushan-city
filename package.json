@@ -5,7 +5,7 @@
   "scripts": {
     "dev:mp-weixin": "uni -p mp-weixin",
     "build:mp-weixin": "node scripts/sync-pg-compat.mjs && uni build -p mp-weixin && node scripts/prepare-devtools.mjs",
-    "test:cloud": "node --test tests/cloud-core.test.cjs tests/config-consistency.test.cjs tests/pg-compat.test.cjs tests/coupon-advisor.test.cjs",
+    "test:cloud": "node --test tests/cloud-core.test.cjs tests/config-consistency.test.cjs tests/pg-compat.test.cjs tests/coupon-advisor.test.cjs tests/diagnostics-and-wallet.test.cjs",
     "check:release": "node scripts/check-release.mjs",
     "dev:h5": "uni --host 0.0.0.0",
     "build:h5": "uni build"

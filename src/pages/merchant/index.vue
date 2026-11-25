@@ -41,35 +41,87 @@
       </view>
     </view>
 
-    <!-- 今日核心数据看板 (基于 PRD 真实指标) -->
-    <view class="board-card" v-if="merchant && USE_MOCK">
+    <!-- 近30日经营与同行对比诊断驾驶舱 (正式云端与演示通用) -->
+    <view class="board-card diag-card" v-if="merchant && merchant.status === 'APPROVED'">
       <view class="board-header">
-        <text class="board-title">本地演示记录</text>
-        <text class="board-date">仅供流程测试</text>
+        <text class="board-title">📊 经营诊断 · 获客与转化</text>
+        <text class="board-date">近 {{ diagnostics?.periodDays || 30 }} 天 · 含今日实时</text>
       </view>
 
-      <view class="data-grid">
-        <view class="data-item">
-          <text class="num">{{ mockCounts.scans }}</text>
-          <text class="label">本店码去重扫码</text>
+      <view v-if="diagnostics">
+        <!-- 漏斗比率三宫格 -->
+        <view class="funnel-grid">
+          <view class="funnel-item">
+            <text class="num">{{ diagnostics.metrics.scans }}</text>
+            <text class="label">扫门店码</text>
+          </view>
+          <view class="funnel-item">
+            <text class="num blue">{{ diagnostics.metrics.acquireRate }}%</text>
+            <text class="label">扫码获客率 ({{ diagnostics.metrics.selfClaims }}张)</text>
+          </view>
+          <view class="funnel-item">
+            <text class="num highlight">{{ diagnostics.metrics.verifyRate }}%</text>
+            <text class="label">核销转化率 ({{ diagnostics.metrics.selfRedeems }}单)</text>
+          </view>
         </view>
-        <view class="data-item">
-          <text class="num">{{ mockCounts.claimed }}</text>
-          <text class="label">本店领券数</text>
+
+        <!-- 跨店联盟与待办条 -->
+        <view class="coop-mini-row">
+          <view class="coop-mini-pill">🤝 盟友带来新客 <text class="bold">{{ diagnostics.metrics.receivedGuests }}</text></view>
+          <view class="coop-mini-pill">🚀 我带出新客 <text class="bold">{{ diagnostics.metrics.broughtGuests }}</text></view>
+          <view class="coop-mini-pill warn" v-if="diagnostics.pendingAppointmentsCount > 0" @tap="goToAppointment">
+            ⏰ 待处理预约 {{ diagnostics.pendingAppointmentsCount }} ›
+          </view>
         </view>
-        <view class="data-item">
-          <text class="num highlight">{{ mockCounts.verified }}</text>
-          <text class="label">本店核销量</text>
+
+        <!-- 同类店铺基准对比 -->
+        <view class="peer-box">
+          <view class="peer-head">
+            <text class="peer-title">同类店铺对比（竹山 · {{ diagnostics.peer.categoryName }}）</text>
+            <text class="peer-count">共 {{ diagnostics.peer.peerCount }} 家店</text>
+          </view>
+
+          <view class="peer-bars" v-if="diagnostics.peer.hasEnoughPeerSample">
+            <view class="peer-row">
+              <view class="peer-row-labels">
+                <text>扫码获客率：本店 {{ diagnostics.metrics.acquireRate }}%</text>
+                <text class="peer-avg">同行均值 {{ diagnostics.peer.peerAvgAcquireRate }}%</text>
+              </view>
+              <view class="bar-track">
+                <view class="bar-fill own" :style="{ width: Math.min(100, diagnostics.metrics.acquireRate) + '%' }"></view>
+                <view class="bar-marker" :style="{ left: Math.min(98, diagnostics.peer.peerAvgAcquireRate) + '%' }"></view>
+              </view>
+              <text class="peer-rank-note" v-if="diagnostics.peer.beatAcquirePercent !== null">高于全县 {{ diagnostics.peer.beatAcquirePercent }}% 同类门店</text>
+            </view>
+
+            <view class="peer-row">
+              <view class="peer-row-labels">
+                <text>核销转化率：本店 {{ diagnostics.metrics.verifyRate }}%</text>
+                <text class="peer-avg">同行均值 {{ diagnostics.peer.peerAvgVerifyRate }}%</text>
+              </view>
+              <view class="bar-track">
+                <view class="bar-fill verify" :style="{ width: Math.min(100, diagnostics.metrics.verifyRate) + '%' }"></view>
+                <view class="bar-marker" :style="{ left: Math.min(98, diagnostics.peer.peerAvgVerifyRate) + '%' }"></view>
+              </view>
+              <text class="peer-rank-note" v-if="diagnostics.peer.beatVerifyPercent !== null">高于全县 {{ diagnostics.peer.beatVerifyPercent }}% 同类门店</text>
+            </view>
+          </view>
+          <view v-else class="peer-empty-note">同业及本店样本正在积累中（需满 5 次以上扫码或领券行为才生成基准对比，避免样本偏差）。</view>
         </view>
-        <view class="data-item">
-          <text class="num blue">{{ mockCounts.crossClaims }}</text>
-          <text class="label">从本店页领合作券</text>
-        </view>
-        <view class="data-item">
-          <text class="num green">{{ mockCounts.confirmedGuests }}</text>
-          <text class="label">{{ merchant._id === 'shop_001' ? '双方确认的带出新客' : '双方确认的收到新客' }}</text>
+
+        <!-- 智能优化建议 -->
+        <view class="suggestions-box" v-if="diagnostics.suggestions.length > 0">
+          <view class="sug-heading">💡 对症优化建议</view>
+          <view class="sug-item" v-for="(sug, idx) in diagnostics.suggestions" :key="idx" @tap="goSuggestionTarget(sug.targetPage)">
+            <view class="sug-main">
+              <text class="sug-title">{{ sug.title }}</text>
+              <text class="sug-detail">{{ sug.detail }}</text>
+            </view>
+            <text class="sug-btn">{{ sug.actionLabel }} ›</text>
+          </view>
         </view>
       </view>
+      <view v-else class="peer-empty-note">正在读取经营统计数据...</view>
     </view>
 
     <!-- 核心操作功能区 -->
@@ -129,8 +181,10 @@ import { useMerchantStore } from '@/store/merchant';
 import { USE_MOCK } from '@/api/adapter';
 import { readMockState } from '@/api/mockState';
 import { getMyMerchants } from '@/api/merchant';
+import { getMerchantDiagnostics } from '@/api/ranking';
 import { getMerchantCodeImage } from '@/api/merchantCode';
 import type { Merchant } from '@/types/merchant';
+import type { MerchantDiagnostics } from '@/types/stat';
 
 const merchantStore = useMerchantStore();
 const merchant = computed(() => merchantStore.currentMerchant);
@@ -142,15 +196,26 @@ const canAppointment = computed(() => USE_MOCK || !!merchant.value?.can_handle_a
 const demoMerchants = ref<Merchant[]>([]);
 const demoMerchantNames = computed(() => demoMerchants.value.map(item => item.name));
 const selectedMerchantIndex = computed(() => Math.max(0, demoMerchants.value.findIndex(item => item._id === merchant.value?._id)));
-const mockCounts = ref({ scans: 0, claimed: 0, verified: 0, crossClaims: 0, confirmedGuests: 0 });
+const diagnostics = ref<MerchantDiagnostics | null>(null);
 const codeUrl = ref('');
 const codeVersion = ref('develop');
+
+const loadDiagnostics = async (targetMerchant: Merchant | null) => {
+  diagnostics.value = null;
+  if (!targetMerchant || targetMerchant.status !== 'APPROVED') return;
+  try {
+    diagnostics.value = await getMerchantDiagnostics(targetMerchant._id);
+  } catch (err) {
+    console.warn('Diagnostics load skipped or failed:', err);
+  }
+};
 
 const refreshCounts = async () => {
   if (!USE_MOCK) {
     try {
       demoMerchants.value = await getMyMerchants();
       if (!demoMerchants.value.some(item => item._id === merchant.value?._id)) merchantStore.setCurrentMerchant(demoMerchants.value[0] || null);
+      await loadDiagnostics(merchantStore.currentMerchant);
     } catch (error) { uni.showToast({ title: error instanceof Error ? error.message : '店铺加载失败', icon: 'none' }); }
     return;
   }
@@ -159,17 +224,13 @@ const refreshCounts = async () => {
   if (!demoMerchants.value.some(item => item._id === merchant.value?._id)) {
     merchantStore.setCurrentMerchant(demoMerchants.value[0] || null);
   }
-  if (!merchant.value) return;
-  const id = merchant.value._id;
-  mockCounts.value = {
-    scans: state.scanLogs.filter(item => item.source_merchant_id === id).length,
-    claimed: state.coupons.filter(item => item.merchant_id === id).length,
-    verified: state.verifyLogs.filter(item => item.merchant_id === id).length,
-    crossClaims: state.coupons.filter(item => item.source_merchant_id === id && item.merchant_id !== id).length,
-    confirmedGuests: state.cooperationResults.filter(item => item.status === 'CONFIRMED' && (id === 'shop_001' ? item.promoter_merchant_id === id : item.buyer_merchant_id === id)).length
-  };
+  await loadDiagnostics(merchant.value);
 };
 onShow(refreshCounts);
+
+const goSuggestionTarget = (url: string) => {
+  if (url) uni.navigateTo({ url });
+};
 
 const changeDemoMerchant = (event: any) => {
   const selected = demoMerchants.value[Number(event.detail.value)];
@@ -433,4 +494,39 @@ const goToCooperation = () => {
   margin-top: 4rpx;
   display: block;
 }
+
+/* 经营诊断与同业对比样式 */
+.diag-card { border-top: 6rpx solid var(--zs-green); }
+.funnel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14rpx; margin-bottom: 18rpx; }
+.funnel-item { background: #f8faf8; padding: 18rpx 10rpx; border-radius: 14rpx; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.funnel-item .num { font-size: 34rpx; font-weight: 900; }
+.funnel-item .label { font-size: 18rpx; color: #64748b; margin-top: 6rpx; }
+
+.coop-mini-row { display: flex; flex-wrap: wrap; gap: 10rpx; margin-bottom: 20rpx; }
+.coop-mini-pill { background: #f1f5f3; color: #334e41; font-size: 20rpx; padding: 8rpx 16rpx; border-radius: 20rpx; }
+.coop-mini-pill .bold { font-weight: 800; color: var(--zs-green); margin-left: 4rpx; }
+.coop-mini-pill.warn { background: #fff3ed; color: #d9521e; font-weight: 700; }
+
+.peer-box { background: #fbfdfb; border: 1rpx solid #e3ebe6; border-radius: 16rpx; padding: 18rpx; margin-bottom: 18rpx; }
+.peer-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14rpx; }
+.peer-title { font-size: 22rpx; font-weight: 800; color: var(--zs-ink); }
+.peer-count { font-size: 19rpx; color: var(--zs-muted); }
+.peer-bars { display: flex; flex-direction: column; gap: 18rpx; }
+.peer-row-labels { display: flex; justify-content: space-between; font-size: 20rpx; color: #374151; font-weight: 600; margin-bottom: 8rpx; }
+.peer-avg { color: #6b7280; font-weight: 500; }
+.bar-track { position: relative; height: 14rpx; border-radius: 7rpx; background: #e5ebe7; overflow: visible; }
+.bar-fill { height: 100%; border-radius: 7rpx; }
+.bar-fill.own { background: linear-gradient(90deg, #17664c, #279973); }
+.bar-fill.verify { background: linear-gradient(90deg, #e05d26, #f5885b); }
+.bar-marker { position: absolute; top: -4rpx; width: 4rpx; height: 22rpx; background: #1f2937; border-radius: 2rpx; z-index: 2; }
+.peer-rank-note { display: block; margin-top: 6rpx; font-size: 19rpx; color: var(--zs-green); font-weight: 700; }
+.peer-empty-note { font-size: 21rpx; color: var(--zs-muted); line-height: 1.5; }
+
+.suggestions-box { display: flex; flex-direction: column; gap: 12rpx; }
+.sug-heading { font-size: 22rpx; font-weight: 800; color: var(--zs-ink); }
+.sug-item { display: flex; justify-content: space-between; align-items: center; gap: 12rpx; background: #fff9f5; border: 1rpx solid #fadbc9; border-radius: 14rpx; padding: 16rpx 18rpx; }
+.sug-main { flex: 1; display: flex; flex-direction: column; gap: 4rpx; }
+.sug-title { font-size: 22rpx; font-weight: 800; color: #b84214; }
+.sug-detail { font-size: 19rpx; color: #6b574d; line-height: 1.45; }
+.sug-btn { flex-shrink: 0; font-size: 20rpx; font-weight: 700; color: #e05d26; background: #fff; padding: 8rpx 14rpx; border-radius: 20rpx; border: 1rpx solid #f6c2aa; }
 </style>

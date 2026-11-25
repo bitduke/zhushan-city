@@ -1,7 +1,7 @@
 import { USE_MOCK, callCloudFunction } from './adapter';
 import { nextMockId, readMockState, writeMockState } from './mockState';
 import shopDetailMock from '@/mock/shopDetail_A.json';
-import type { UserCoupon } from '@/types/coupon';
+import type { UserCoupon, UserCouponSummary } from '@/types/coupon';
 import { VERIFY_ERROR_CODES, VERIFY_ERROR_MESSAGES } from '@/constants/errCodes';
 import { useUserStore } from '@/store/user';
 import { reservableCooperation, recordVerifiedCooperationResult } from './cooperation';
@@ -103,10 +103,72 @@ export async function getMyCoupons(): Promise<UserCoupon[]> {
   }
   const state = readMockState();
   if (refreshExpiry(state.coupons)) writeMockState(state);
-  return state.coupons.filter(item => item.user_id === currentUserId()).map(item => ({
-    ...item,
-    merchant_suspended: !state.merchants.some(merchant => merchant._id === item.merchant_id && merchant.status === 'APPROVED')
-  }));
+  return state.coupons.filter(item => item.user_id === currentUserId()).map(item => {
+    const merchant = state.merchants.find(m => m._id === item.merchant_id);
+    return {
+      ...item,
+      category_id: item.category_id || merchant?.category_id || '',
+      category_name: item.category_name || merchant?.category_name || '',
+      merchant_suspended: !merchant || merchant.status !== 'APPROVED'
+    };
+  });
+}
+
+const EXPIRING_SOON_WINDOW_MS = 72 * 3600000;
+
+export function summarizeMyCoupons(coupons: UserCoupon[], now = Date.now()): UserCouponSummary {
+  const unused: UserCoupon[] = [];
+  let usedCount = 0;
+  let expiredCount = 0;
+  let totalSavedYuan = 0;
+  const categoryCounts: Record<string, number> = {};
+
+  for (const coupon of coupons) {
+    if (coupon.status === 'UNUSED') {
+      const expTime = new Date(coupon.expires_at).getTime();
+      if (expTime <= now) {
+        expiredCount += 1;
+      } else {
+        unused.push(coupon);
+        const catId = coupon.category_id || 'other';
+        categoryCounts[catId] = (categoryCounts[catId] || 0) + 1;
+      }
+    } else if (coupon.status === 'USED') {
+      usedCount += 1;
+      totalSavedYuan += Number(coupon.rule_snapshot?.discount_amount || 0);
+    } else if (coupon.status === 'EXPIRED') {
+      expiredCount += 1;
+    }
+  }
+
+  const expiringSoonList = unused
+    .filter(c => new Date(c.expires_at).getTime() - now <= EXPIRING_SOON_WINDOW_MS)
+    .sort((a, b) => new Date(a.expires_at).getTime() - new Date(b.expires_at).getTime());
+
+  const sortedUnused = [...unused].sort((a, b) => new Date(a.expires_at).getTime() - new Date(b.expires_at).getTime());
+
+  return {
+    unusedCount: unused.length,
+    usedCount,
+    expiredCount,
+    totalSavedYuan: Math.round(totalSavedYuan * 100) / 100,
+    expiringSoonList,
+    nearestExpiring: expiringSoonList[0] || sortedUnused[0] || null,
+    categoryCounts
+  };
+}
+
+export function formatCountdown(expiresAt: string, now = Date.now()): string {
+  const diff = new Date(expiresAt).getTime() - now;
+  if (!Number.isFinite(diff) || diff <= 0) return '即将到期';
+  const totalSec = Math.floor(diff / 1000);
+  const days = Math.floor(totalSec / 86400);
+  const hours = Math.floor((totalSec % 86400) / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const secs = totalSec % 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  if (days >= 1) return `${days}天 ${pad(hours)}:${pad(mins)}:${pad(secs)}`;
+  return `${pad(hours)}:${pad(mins)}:${pad(secs)}`;
 }
 
 export async function getCouponByCode(code: string): Promise<UserCoupon | null> {
