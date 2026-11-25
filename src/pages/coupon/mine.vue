@@ -62,6 +62,8 @@
 import { ref, computed } from 'vue';
 import { onShow, onHide, onUnload, onPullDownRefresh, onShareAppMessage } from '@dcloudio/uni-app';
 import { getMyCoupons, summarizeMyCoupons, formatCountdown } from '@/api/coupon';
+import { USE_MOCK } from '@/api/adapter';
+import { ensureRichDemoPreviewData } from '@/api/mockState';
 import { MERCHANT_CATEGORIES } from '@/constants/enums';
 import type { UserCoupon } from '@/types/coupon';
 import CouponCard from '@/components/CouponCard.vue';
@@ -79,6 +81,7 @@ const filterCategories = [
 
 const loadCoupons = async () => {
   try {
+    if (USE_MOCK) ensureRichDemoPreviewData();
     coupons.value = await getMyCoupons();
     nowTick.value = Date.now();
   } catch (err) {

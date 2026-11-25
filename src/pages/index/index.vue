@@ -248,13 +248,14 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { onShow, onHide, onUnload, onPullDownRefresh, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
+import { onLoad, onShow, onHide, onUnload, onPullDownRefresh, onShareAppMessage, onShareTimeline } from '@dcloudio/uni-app';
 import { ZHUSHAN_TOWNS } from '@/constants/regions';
 import { getHomeData } from '@/api/home';
 import { getMyCoupons, summarizeMyCoupons, formatCountdown } from '@/api/coupon';
 import { getMyMerchants } from '@/api/merchant';
 import { getMerchantDiagnostics } from '@/api/ranking';
 import { USE_MOCK } from '@/api/adapter';
+import { ensureRichDemoPreviewData } from '@/api/mockState';
 import { hasServiceConsent } from '@/utils/consent';
 import { useUserStore } from '@/store/user';
 import { useMerchantStore } from '@/store/merchant';
@@ -285,11 +286,18 @@ const myCoupons = ref<UserCoupon[]>([]);
 const activeMerchant = ref<Merchant | null>(null);
 const merchantDiagnostics = ref<MerchantDiagnostics | null>(null);
 const nowTick = ref(Date.now());
+const demoRoleOverride = ref<'resident' | 'merchant' | 'admin' | null>(null);
 let tickTimer: ReturnType<typeof setInterval> | null = null;
 
-const isAdmin = computed(() => userStore.profile?.role === 'ADMIN' || userStore.isDemoAdmin);
+const isAdmin = computed(() => {
+  if (USE_MOCK && demoRoleOverride.value) return demoRoleOverride.value === 'admin';
+  return userStore.profile?.role === 'ADMIN' || userStore.isDemoAdmin;
+});
 const couponSummary = computed(() => summarizeMyCoupons(myCoupons.value, nowTick.value));
-const showResidentSavings = computed(() => couponSummary.value.unusedCount > 0 || couponSummary.value.usedCount > 0);
+const showResidentSavings = computed(() => {
+  if (USE_MOCK && demoRoleOverride.value && demoRoleOverride.value !== 'resident') return false;
+  return couponSummary.value.unusedCount > 0 || couponSummary.value.usedCount > 0;
+});
 
 // 行业优惠快筛
 const industryShortcuts = [
@@ -311,13 +319,26 @@ const categories = [
   { id: 'other', name: '其他便民', iconPath: '', bg: '#F3E8FF', shortText: '自', textColor: '#7E22CE' }
 ];
 
+onLoad((options: any) => {
+  if (USE_MOCK && ['resident', 'merchant', 'admin'].includes(options?.demoRole)) {
+    demoRoleOverride.value = options.demoRole;
+  }
+});
+
 const loadRoleCockpit = async () => {
   if (!hasServiceConsent()) return;
   try {
+    if (USE_MOCK) ensureRichDemoPreviewData(userStore.profile?._id || 'u_guest_demo');
     const couponsTask = getMyCoupons().catch(() => [] as UserCoupon[]);
     const merchantsTask = getMyMerchants().catch(() => [] as Merchant[]);
     const [couponsRes, merchantsRes] = await Promise.all([couponsTask, merchantsTask]);
     myCoupons.value = couponsRes;
+
+    if (USE_MOCK && (demoRoleOverride.value === 'resident' || demoRoleOverride.value === 'admin')) {
+      activeMerchant.value = null;
+      merchantDiagnostics.value = null;
+      return;
+    }
 
     const approvedMerchant = merchantsRes.find(m => m.status === 'APPROVED') || null;
     activeMerchant.value = approvedMerchant;

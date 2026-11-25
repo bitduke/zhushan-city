@@ -146,3 +146,189 @@ export function nextMockId(state: MockCoreState, prefix: string): string {
   state.nextId += 1;
   return id;
 }
+
+// 仅用于本机演示预览：当无演示样本时填充一份居民省钱+临期倒计时与商家同业诊断样板数据
+export function ensureRichDemoPreviewData(userId = 'u_guest_demo'): void {
+  const state = readMockState();
+  const now = Date.now();
+  let changed = false;
+
+  if (!state.merchants.some(m => m._id === 'shop_peer_apparel')) {
+    state.merchants.push({
+      _id: 'shop_peer_apparel',
+      owner_id: 'peer_owner_demo',
+      name: '青竹坊精品服饰 (城关二店)',
+      category_id: 'apparel',
+      category_name: '服装女装',
+      town: '城关镇',
+      address: '竹山县人民路银泰商厦1楼',
+      phone: '13900008888',
+      avatar: '',
+      images: [],
+      description: '同行业演示基准对比门店',
+      business_hours: '09:30 - 21:30',
+      daily_booking_limit: 0,
+      status: 'APPROVED',
+      qrcode_token: 'mPeer01',
+      created_at: '2026-11-01'
+    });
+    changed = true;
+  }
+
+  if (state.coupons.length === 0) {
+    state.coupons.push(
+      {
+        _id: 'demo_uc_used_1',
+        code: 'ZSDEMOUSED001',
+        user_id: userId,
+        coupon_id: 'demo_tpl_1',
+        merchant_id: 'shop_001',
+        merchant_name: '雅致名媛女装店 (城关人民路店)',
+        category_id: 'apparel',
+        category_name: '服装女装',
+        source_merchant_id: 'shop_001',
+        status: 'USED',
+        claimed_at: new Date(now - 5 * 86400000).toISOString(),
+        used_at: new Date(now - 3 * 86400000).toISOString(),
+        expires_at: new Date(now + 20 * 86400000).toISOString(),
+        rule_snapshot: {
+          title: '盟友专享当季正价女装满128减25',
+          type: 'FULL_REDUCTION',
+          condition_amount: 128,
+          discount_amount: 25,
+          usage_mode: 'INSTANT',
+          booking_required: false,
+          valid_days: 30,
+          instructions: '正价服饰满128立减25元。'
+        }
+      },
+      {
+        _id: 'demo_uc_used_2',
+        code: 'ZSDEMOUSED002',
+        user_id: userId,
+        coupon_id: 'demo_tpl_2',
+        merchant_id: 'shop_002',
+        merchant_name: '奈奈日式美睫美甲沙龙',
+        category_id: 'beauty',
+        category_name: '美容美甲',
+        source_merchant_id: 'shop_001',
+        status: 'USED',
+        claimed_at: new Date(now - 7 * 86400000).toISOString(),
+        used_at: new Date(now - 2 * 86400000).toISOString(),
+        expires_at: new Date(now + 15 * 86400000).toISOString(),
+        rule_snapshot: {
+          title: '纯色美甲护理体验满48抵15元',
+          type: 'EXPERIENCE',
+          condition_amount: 48,
+          discount_amount: 15,
+          usage_mode: 'WALK_IN',
+          booking_required: false,
+          valid_days: 30,
+          instructions: '正价基础美甲护理可用。'
+        }
+      },
+      {
+        _id: 'demo_uc_soon_1',
+        code: 'ZSDEMOSOON001',
+        user_id: userId,
+        coupon_id: 'demo_tpl_3',
+        merchant_id: 'shop_001',
+        merchant_name: '雅致名媛女装店 (城关人民路店)',
+        category_id: 'apparel',
+        category_name: '服装女装',
+        source_merchant_id: 'shop_001',
+        status: 'UNUSED',
+        claimed_at: new Date(now - 2 * 86400000).toISOString(),
+        expires_at: new Date(now + 18 * 3600000).toISOString(),
+        rule_snapshot: {
+          title: '街坊专享满88减18元换季券',
+          type: 'FULL_REDUCTION',
+          condition_amount: 88,
+          discount_amount: 18,
+          usage_mode: 'INSTANT',
+          booking_required: false,
+          valid_days: 7,
+          instructions: '到店实付满88元立减18元。'
+        }
+      },
+      {
+        _id: 'demo_uc_unused_2',
+        code: 'ZSDEMOBEAUTY01',
+        user_id: userId,
+        coupon_id: 'demo_tpl_4',
+        merchant_id: 'shop_003',
+        merchant_name: '御竹轩足道养生会所',
+        category_id: 'foot_bath',
+        category_name: '足道养生',
+        source_merchant_id: 'shop_001',
+        status: 'UNUSED',
+        claimed_at: new Date(now - 1 * 86400000).toISOString(),
+        expires_at: new Date(now + 14 * 86400000).toISOString(),
+        rule_snapshot: {
+          title: '下午闲时养生预约满98减20元',
+          type: 'FULL_REDUCTION',
+          condition_amount: 98,
+          discount_amount: 20,
+          usage_mode: 'BOOKING',
+          booking_required: true,
+          valid_days: 30,
+          instructions: '限每天12:00-18:00预约进店使用。'
+        }
+      }
+    );
+    changed = true;
+  }
+
+  if (state.scanLogs.length === 0) {
+    // shop_001: 20次扫码, 5次自己领券(25%获客率)
+    for (let i = 0; i < 20; i++) {
+      state.scanLogs.push({ token: 'mA001', source_merchant_id: 'shop_001', user_id: `demo_u_${i}`, scanned_at: nowIso(now - i * 3600000) });
+    }
+    // 同行对照店 shop_peer_apparel: 10次扫码, 6次领券(60%获客率)
+    for (let i = 0; i < 10; i++) {
+      state.scanLogs.push({ token: 'mPeer01', source_merchant_id: 'shop_peer_apparel', user_id: `peer_u_${i}`, scanned_at: nowIso(now - i * 3600000) });
+    }
+    for (let i = 0; i < 6; i++) {
+      state.coupons.push({
+        _id: `peer_uc_${i}`,
+        code: `ZSPEER00${i}`,
+        user_id: `peer_u_${i}`,
+        coupon_id: 'peer_tpl',
+        merchant_id: 'shop_peer_apparel',
+        merchant_name: '青竹坊精品服饰 (城关二店)',
+        category_id: 'apparel',
+        category_name: '服装女装',
+        source_merchant_id: 'shop_peer_apparel',
+        status: i < 4 ? 'USED' : 'UNUSED',
+        claimed_at: nowIso(now - 86400000),
+        expires_at: nowIso(now + 20 * 86400000),
+        rule_snapshot: { title: '同行对照券', type: 'FULL_REDUCTION', condition_amount: 100, discount_amount: 15, usage_mode: 'INSTANT', booking_required: false, valid_days: 30, instructions: '对照测试' }
+      });
+    }
+    // 补充 shop_001 的其他4名领券记录，凑满6张领券样本以便产生精确对比率
+    for (let i = 0; i < 4; i++) {
+      state.coupons.push({
+        _id: `shop1_extra_uc_${i}`,
+        code: `ZSS1EXTRA0${i}`,
+        user_id: `demo_u_${i}`,
+        coupon_id: 'demo_tpl_1',
+        merchant_id: 'shop_001',
+        merchant_name: '雅致名媛女装店 (城关人民路店)',
+        category_id: 'apparel',
+        category_name: '服装女装',
+        source_merchant_id: 'shop_001',
+        status: 'UNUSED',
+        claimed_at: nowIso(now - 86400000),
+        expires_at: nowIso(now + 10 * 86400000),
+        rule_snapshot: { title: '女装满减体验', type: 'FULL_REDUCTION', condition_amount: 128, discount_amount: 25, usage_mode: 'INSTANT', booking_required: false, valid_days: 30, instructions: '满128减25' }
+      });
+    }
+    changed = true;
+  }
+
+  if (changed) writeMockState(state);
+}
+
+function nowIso(ms: number): string {
+  return new Date(ms).toISOString();
+}

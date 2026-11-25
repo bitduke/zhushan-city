@@ -179,7 +179,7 @@ import { computed, ref } from 'vue';
 import { onShow } from '@dcloudio/uni-app';
 import { useMerchantStore } from '@/store/merchant';
 import { USE_MOCK } from '@/api/adapter';
-import { readMockState } from '@/api/mockState';
+import { readMockState, ensureRichDemoPreviewData } from '@/api/mockState';
 import { getMyMerchants } from '@/api/merchant';
 import { getMerchantDiagnostics } from '@/api/ranking';
 import { getMerchantCodeImage } from '@/api/merchantCode';
@@ -219,6 +219,7 @@ const refreshCounts = async () => {
     } catch (error) { uni.showToast({ title: error instanceof Error ? error.message : '店铺加载失败', icon: 'none' }); }
     return;
   }
+  ensureRichDemoPreviewData();
   const state = readMockState();
   demoMerchants.value = state.merchants.filter(item => item.status === 'APPROVED');
   if (!demoMerchants.value.some(item => item._id === merchant.value?._id)) {
